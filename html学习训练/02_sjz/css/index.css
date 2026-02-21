@@ -1,0 +1,127 @@
+* {
+  /* 改变元素宽度和高度的计算方式 */
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow-y: hidden;
+  background-color: rgb(21, 21, 21);
+}
+
+.main {
+  width: 100%;
+  height: 950px;
+  background-image: url(../static/images/background.jpg);
+  background-size: 100% 100%;
+}
+
+.ganyuan {
+  width: 447px;
+  height: 81px;
+  background-image: url(../static/images/ganyuan.png);
+  background-size: 100% 100%;
+  margin-left: 200px;
+  margin-bottom: 80px;
+}
+.skill {
+  width: 510px;
+  height: 86px;
+  margin-left: 200px;
+  display: flex;
+  align-items: center;
+}
+.skill-img {
+  width: 44.5px;
+  height: 44px;
+}
+.skill-text-top {
+  width: 425px;
+  height: 32px;
+  font-size: 23px;
+  color: white;
+  font-weight: bold;
+}
+.wuming {
+  background-image: url("../static/images/background2.jpg");
+}
+.text-box {
+  margin-left: 20px;
+}
+.skill-text-bottom {
+  font-size: 14px;
+  color: white;
+}
+.info {
+  width: 1158px;
+  height: 112px;
+  margin: 0 auto;
+  margin-top: 40px;
+}
+span {
+  font-size: 18px !important;
+  vertical-align: 5px;
+  margin-left: 15px;
+}
+.info-name {
+  font-size: 30px;
+  color: white;
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+.desc {
+  font-size: 23px;
+  color: #e8e8e8;
+}
+.swiper {
+  width: 1146px;
+  height: 115px;
+  /* background-color: skyblue; */
+  margin: 0 auto;
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+.swiper-item {
+  width: 207px;
+  height: 113px;
+  background-size: 100% 100%;
+}
+.next,
+.sibiling {
+  width: 18px;
+  height: 33px;
+  position: absolute;
+}
+.next {
+  right: -40px;
+  bottom: 40px;
+  background-image: url(../static/images/next.png);
+  background-size: 100% 100%;
+}
+.sibiling {
+  left: -40px;
+  bottom: 40px;
+  background-image: url(../static/images/next.png);
+  background-size: 100% 100%;
+  transform: rotate(180deg);
+}
+.item1 {
+  background-image: url(../static/images/background.jpg);
+}
+.item2 {
+  background-image: url(../static/images/pic2.jpg);
+}
+.item3 {
+  background-image: url(../static/images/pic3.jpg);
+}
+.item4 {
+  background-image: url(../static/images/pic4.jpg);
+}
+.item5 {
+  background-image: url(../static/images/pic5.jpg);
+}
+
+.active {
+  border: 1px solid #f4cf67;
+}
