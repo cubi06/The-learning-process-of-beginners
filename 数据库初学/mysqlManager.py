@@ -3,7 +3,7 @@ import pymysql
 connection = pymysql.connect(
     host='localhost',
     user='root',
-    password='ZJX110707zjx@kfccnm',
+    password='',
     database='class',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -53,4 +53,5 @@ def get_all_id():
     sql = f'select id from student_manager;'
     cursor.execute(sql)
     return [item['id'] for item in cursor.fetchall()]
+
 
