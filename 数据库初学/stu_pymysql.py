@@ -3,7 +3,7 @@ import pymysql
 connection=pymysql.connect(
     host='localhost',
     user='root',
-    password='ZJX110707zjx@kfccnm',
+    password='',
     database='class',
     cursorclass = pymysql.cursors.DictCursor
 )
@@ -39,4 +39,5 @@ sql ="select * from sanguo;"
 cursor.execute(sql)
 result = cursor.fetchall()
 for itme in result:
+
     print(itme)
