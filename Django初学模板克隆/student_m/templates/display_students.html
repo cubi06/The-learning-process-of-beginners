@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生信息管理系统</title>
+    <script src="/static/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+
+        .add-student-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .add-student-btn:hover {
+            background: linear-gradient(135deg, #44a08d, #4ecdc4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .add-student-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .add-student-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .add-student-btn:hover::before {
+            left: 100%;
+        }
+
+        .add-icon {
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .students-list {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .header-item {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-item:first-child {
+            flex: 0.8;
+        }
+
+        .header-item:nth-child(2) {
+            flex: 1.5;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: slideInLeft 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(5px);
+            box-shadow: 5px 0 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .student-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .student-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .item-data {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .item-data:first-child {
+            flex: 0.8;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .item-data:nth-child(2) {
+            flex: 1.5;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .performance-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-excellent {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        .performance-good {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+        }
+
+        .performance-normal {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            color: white;
+            box-shadow: 0 2px 8px rgba(254, 202, 87, 0.3);
+        }
+
+        .no-data {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .no-data h3 {
+            color: #666;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .no-data p {
+            color: #999;
+            font-size: 16px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 28px;
+            }
+
+            .add-student-btn {
+                font-size: 14px;
+                padding: 10px 20px;
+                gap: 8px;
+            }
+
+            .add-icon {
+                font-size: 16px;
+            }
+            
+            .list-header,
+            .student-item {
+                padding: 15px 20px;
+            }
+            
+            .header-item,
+            .item-data {
+                font-size: 14px;
+            }
+            
+            .item-data:nth-child(2) {
+                font-size: 16px;
+            }
+            
+            .score-value {
+                font-size: 18px;
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .header-section {
+                margin-bottom: 30px;
+            }
+
+            .add-student-btn {
+                font-size: 13px;
+                padding: 8px 16px;
+                gap: 6px;
+            }
+
+            .add-icon {
+                font-size: 14px;
+            }
+            
+            .list-header,
+            .student-item {
+                padding: 12px 15px;
+            }
+            
+            .header-item,
+            .item-data {
+                font-size: 13px;
+            }
+            
+            .score-value {
+                font-size: 16px;
+            }
+            
+            .performance-badge {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .student-item:nth-child(1) { animation-delay: 0.1s; }
+        .student-item:nth-child(2) { animation-delay: 0.2s; }
+        .student-item:nth-child(3) { animation-delay: 0.3s; }
+        .student-item:nth-child(4) { animation-delay: 0.4s; }
+        .student-item:nth-child(5) { animation-delay: 0.5s; }
+        .student-item:nth-child(6) { animation-delay: 0.6s; }
+        .student-item:nth-child(7) { animation-delay: 0.7s; }
+        .student-item:nth-child(8) { animation-delay: 0.8s; }
+        .student-item:nth-child(9) { animation-delay: 0.9s; }
+        .student-item:nth-child(10) { animation-delay: 1.0s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 删除按钮样式 */
+        .delete-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #ee5a6f, #ff6b6b);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .delete-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        .delete-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .delete-icon {
+            font-size: 16px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-3px);
+            }
+            60% {
+                transform: translateY(-1px);
+            }
+        }
+
+        /* 加载状态样式 */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* 确认删除弹窗样式 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+        }
+
+        .confirm-modal.show .confirm-content {
+            transform: scale(1);
+        }
+
+        .confirm-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .confirm-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-btn, .cancel-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            background: linear-gradient(135deg, #ee5a6f, #ff6b6b);
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+
+        .cancel-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">🎓 学生信息管理系统</h1>
+            <a href="/add_students/" class="add-student-btn">
+                <span class="add-icon">➕</span>
+                添加学生
+            </a>
+        </div>
+        {% if students %}
+            <div class="students-list">
+                <div class="list-header">
+                    <div class="header-item">学号</div>
+                    <div class="header-item">姓名</div>
+                    <div class="header-item">年龄</div>
+                    <div class="header-item">班级</div>
+                    <div class="header-item">成绩</div>
+                </div>
+                
+                {% for item in students %}
+                    <div class="student-item">
+                        <div class="item-data">{{ item.id }}</div>
+                        <div class="item-data">{{ item.name }}</div>
+                        <div class="item-data">{{ item.age }}岁</div>
+                        <div class="item-data">{{ item.grade }}</div>
+                        <div class="item-data">
+                            <div class="score-value">
+                                {{ item.score }}分
+                                <span class="performance-badge 
+                                    {% if item.score > 90 %}
+                                        performance-excellent
+                                    {% elif item.score >= 80 %}
+                                        performance-good
+                                    {% else %}
+                                        performance-normal
+                                    {% endif %}">
+                                    {% if item.score > 90 %}
+                                        无敌
+                                    {% elif item.score >= 80 %}
+                                        优秀
+                                    {% else %}
+                                        加油
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="item-data">
+                            <button class="delete-btn" onclick="deleteStudent({{ item.id }})">
+                                <span class="delete-icon">🗑️</span>
+                                删除
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-data">
+                <h3>😔 暂无学生数据</h3>
+                <p>请先添加学生信息</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 确认删除弹窗 -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-content">
+            <div class="confirm-title">⚠️ 确认删除</div>
+            <div class="confirm-message">您确定要删除这个学生的信息吗？<br>此操作无法撤销。</div>
+            <div class="confirm-buttons">
+                <button class="cancel-btn" onclick="hideConfirmModal()">取消</button>
+                <button class="confirm-btn" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    let currentStudentId = null;
+
+    // 显示确认删除弹窗
+    function deleteStudent(stu_id) {
+        currentStudentId = stu_id;
+        const modal = document.getElementById('confirmModal');
+        modal.classList.add('show');
+    }
+
+    // 隐藏确认删除弹窗
+    function hideConfirmModal() {
+        const modal = document.getElementById('confirmModal');
+        modal.classList.remove('show');
+        currentStudentId = null;
+    }
+
+    // 确认删除操作
+    function confirmDelete() {
+        if (!currentStudentId) return;
+
+        const confirmBtn = document.querySelector('.confirm-btn');
+        const originalText = confirmBtn.textContent;
+        
+        // 显示加载状态
+        confirmBtn.textContent = '删除中...';
+        confirmBtn.disabled = true;
+        confirmBtn.classList.add('loading');
+
+        // 执行删除请求
+        $.ajax({
+            url: `http://127.0.0.1:8000/delete_students/${currentStudentId}/`,
+            method: "GET",
+            success: function(response) {
+                console.log("删除成功，即将刷新页面");
+                
+                // 隐藏弹窗
+                hideConfirmModal();
+                
+                // 显示成功提示并刷新页面
+                showSuccessMessage("学生信息删除成功！");
+                
+                // 延迟刷新页面，让用户看到成功提示
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function(xhr, status, error) {
+                console.error("删除失败:", error);
+                
+                // 恢复按钮状态
+                confirmBtn.textContent = originalText;
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('loading');
+                
+                // 显示错误提示
+                showErrorMessage("删除失败，请稍后重试！");
+            }
+        });
+    }
+
+    // 显示成功提示
+    function showSuccessMessage(message) {
+        const toast = createToast(message, 'success');
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // 显示错误提示
+    function showErrorMessage(message) {
+        const toast = createToast(message, 'error');
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // 创建提示框
+    function createToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+                <span class="toast-message">${message}</span>
+            </div>
+        `;
+        
+        // 添加样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                z-index: 2000;
+                transform: translateX(400px);
+                transition: all 0.3s ease;
+                border-left: 4px solid;
+                max-width: 350px;
+            }
+            
+            .toast.show {
+                transform: translateX(0);
+            }
+            
+            .toast-success {
+                border-left-color: #4ecdc4;
+            }
+            
+            .toast-error {
+                border-left-color: #ff6b6b;
+            }
+            
+            .toast-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .toast-icon {
+                font-size: 20px;
+            }
+            
+            .toast-message {
+                font-size: 14px;
+                font-weight: 500;
+                color: #333;
+            }
+        `;
+        
+        if (!document.querySelector('.toast-styles')) {
+            style.className = 'toast-styles';
+            document.head.appendChild(style);
+        }
+        
+        return toast;
+    }
+
+    // 点击弹窗外部关闭弹窗
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideConfirmModal();
+        }
+    });
+
+    // ESC键关闭弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideConfirmModal();
+        }
+    });
+
+    // 页面加载完成后的初始化
+    $(document).ready(function() {
+        console.log("学生信息管理系统已加载完成");
+        
+        // 为删除按钮添加悬停效果
+        $('.delete-btn').hover(
+            function() {
+                $(this).find('.delete-icon').css('animation-play-state', 'paused');
+            },
+            function() {
+                $(this).find('.delete-icon').css('animation-play-state', 'running');
+            }
+        );
+    });
+</script>

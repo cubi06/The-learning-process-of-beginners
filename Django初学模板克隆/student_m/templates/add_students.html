@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form method="post" action="/add_students/">
+        {% csrf_token %}
+        <div>学生姓名:</div>
+        <input type="text" name="name" placeholder="请输入学生姓名">
+        <div>学生年龄:</div>
+        <input type="text" name="age" placeholder="请输入学生年龄">
+        <div>专业年级:</div>
+        <input type="text" name="grade" placeholder="请输入专业年级">
+        <div>考试分数:</div>
+        <input type="text" name="score" placeholder="请输入考试分数">
+        <button type="submit">提交数据</button>
+    </form>
+</body>
+</html>
