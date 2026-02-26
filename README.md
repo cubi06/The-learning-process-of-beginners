@@ -8,4 +8,6 @@ The learning process of beginners
 mysql数据库环境配置，数据库的使用
 
 (3)day7——day13
-Django 项目文件创建，AI搭建网页，后端基础操作
+Django 项目文件创建，学习他人模板，学习Django基础操作
+
+(4)
