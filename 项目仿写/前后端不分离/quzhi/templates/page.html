@@ -1,0 +1,380 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/task-page.css' %}">
+    <link href="{% static 'css/calendar.css' %}" rel="stylesheet" type="text/css">
+    <title>任务管理 - 趣智系统</title>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+                <span class="nav-title">趣智任务管理</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/home/" class="nav-link">首页</a></li>
+                <li><a href="/visualization/" class="nav-link active">任务</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-container">
+        <!-- 用户状态侧边栏 -->
+        <aside class="user-sidebar">
+            <div class="user-profile" onclick="showDialog()">
+                <div class="user-avatar">
+                    <img src="{% static 'img/li1.png' %}" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <!-- change -->
+                     <h3 class="user-name">{{user.name}}</h3>
+<!--                    <h3 class="user-name">小白</h3>-->
+                    <p class="user-level">任务管理专家</p>
+                </div>
+            </div>
+
+
+
+            <!-- 快捷导航 -->
+            <nav class="quick-nav">
+                <a href="/visualization/" class="nav-item active">
+                    <div class="nav-icon">📋</div>
+                    <span>任务</span>
+                </a>
+                <!-- change -->
+                 <a href="/visualization/displaytree/" class="nav-item">
+<!--                <a href="#" class="nav-item">-->
+                    <div class="nav-icon">🌳</div>
+                    <span>事件总览</span>
+                </a>
+                <!-- change -->
+                 <a href="/visualization/pinechart/" class="nav-item">
+<!--                <a href="#" class="nav-item">-->
+                    <div class="nav-icon">📈</div>
+                    <span>完成情况</span>
+                </a>
+            </nav>
+
+            <!-- 快速统计 -->
+            <div class="quick-stats" style="background: #f8f9fa; border-radius: 12px; padding: 20px;">
+                <h4 style="margin-bottom: 15px; color: #333; font-size: 16px;">📊 快速统计</h4>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">📋</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                         <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ total_tasks }}</span>
+<!--                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">3</span>-->
+                        <span class="stat-label" style="font-size: 12px; color: #666;">总任务</span>
+                    </div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">✅</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                         <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ completed_tasks_today }}</span>
+                        <span class="stat-label" style="font-size: 12px; color: #666;">今日完成</span>
+                    </div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">⏳</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ pending_tasks }}</span>
+<!--                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">2</span>-->
+                        <span class="stat-label" style="font-size: 12px; color: #666;">待完成</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 任务标签页 -->
+            <div class="task-tabs">
+                <button class="tab-btn active" data-tab="daily">📅 每日任务</button>
+                <button class="tab-btn" data-tab="todo">📝 待办事项</button>
+            </div>
+
+            <!-- 任务内容区域 -->
+            <div class="task-content">
+                <!-- 任务列表 -->
+                <div class="task-list-container">
+                    <div class="task-grid">
+
+                        {% for task in user.tasks.all %}
+                            <div class="task-card" data-task-id="{{ task.id }}">
+                                <div class="task-header">
+                                    <h3 class="task-title">{{ task.name }}</h3>
+                                    <div class="task-status-actions" style="display: flex; align-items: center; gap: 12px;">
+                                        {% if task.id in completed_task_ids %}
+                                            <span class="status-badge completed">已完成</span>
+                                        {% else %}
+                                            <span class="status-badge active">进行中</span>
+                                        {% endif %}
+                                        <button class="delete-btn" onclick="deleteTask('{{ task.id }}', '{{ task.name }}')" title="删除任务"
+                                                style="background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"
+                                                onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"
+                                                onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">
+                                            <span class="delete-text">删除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="task-details">
+                                    <div class="task-info">
+                                        <div class="info-item">
+                                            <span class="info-label">开始时间</span>
+                                            <span class="info-value">{{ task.begin }}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">结束时间</span>
+                                            <span class="info-value">{{ task.end }}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">频率</span>
+                                            <span class="info-value">{{ task.frequency }} 次/天</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        {% endfor %}
+
+<!--                        <div class="task-card" data-task-id="0">-->
+<!--                            <div class="task-header">-->
+<!--                                <h3 class="task-title">学习</h3>-->
+<!--                                <div class="task-status-actions" style="display: flex; align-items: center; gap: 12px;">-->
+<!--                                    <span class="status-badge completed">已完成</span>-->
+<!--                                    <button class="delete-btn" onclick="deleteTask('0', '学习')" title="删除任务"-->
+<!--                                            style="background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"-->
+<!--                                            onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"-->
+<!--                                            onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">-->
+<!--                                        <span class="delete-text">删除</span>-->
+<!--                                    </button>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="task-details">-->
+<!--                                <div class="task-info">-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">开始时间</span>-->
+<!--                                        <span class="info-value">2025年8月23日</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">结束时间</span>-->
+<!--                                        <span class="info-value">2025年8月23日</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">频率</span>-->
+<!--                                        <span class="info-value">1 次/天</span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="task-card" data-task-id="1">-->
+<!--                            <div class="task-header">-->
+<!--                                <h3 class="task-title">玩耍</h3>-->
+<!--                                <div class="task-status-actions" style="display: flex; align-items: center; gap: 12px;">-->
+<!--                                    <span class="status-badge active">进行中</span>-->
+<!--                                    <button class="delete-btn" onclick="deleteTask('1', '玩耍')" title="删除任务"-->
+<!--                                            style="background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"-->
+<!--                                            onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"-->
+<!--                                            onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">-->
+<!--                                        <span class="delete-text">删除</span>-->
+<!--                                    </button>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="task-details">-->
+<!--                                <div class="task-info">-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">开始时间</span>-->
+<!--                                        <span class="info-value">2025年8月23日</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">结束时间</span>-->
+<!--                                        <span class="info-value">2025年8月23日</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="info-item">-->
+<!--                                        <span class="info-label">频率</span>-->
+<!--                                        <span class="info-value">1 次/天</span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+
+                    </div>
+                </div>
+
+                <!-- 日历区域 -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h3>📅 任务日历</h3>
+                    </div>
+                    <div id="calendar-widget" class="calendar-widget"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 用户信息对话框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <form method="post" action="/infochange/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <input type="text" value="{{ user.id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <input type="text" name="uname" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/calendar.js' %}"></script>
+
+    <script>
+        // 用户对话框控制
+        function showDialog() {
+            document.getElementById("user-modal").style.display = "block";
+        }
+
+        function closeDialog() {
+            document.getElementById("user-modal").style.display = "none";
+        }
+
+
+
+        // 标签页切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                if (tab === 'todo') {
+                    // change
+                    window.location.href = '/visualization/todo_list/';
+                }
+            });
+        });
+
+        // 任务卡片点击效果
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.task-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // 初始化日历
+        function initCalendar() {
+            new Calendar({
+                parent: 'calendar-widget',
+                time: new Date().toISOString().split('T')[0],
+                timeArray: '',
+                viewMode: 0,
+                pickMode: 'multiple',
+            });
+        }
+
+        // 页面加载完成后初始化日历
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initCalendar, 100);
+        });
+
+        // 删除任务函数
+        function deleteTask(taskId, taskName) {
+            if (confirm(`确定要删除任务"${taskName}"吗？\n删除后将无法恢复！`)) {
+                console.log('开始删除任务:', taskId, taskName);
+
+                // 检查CSRF token
+                const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    alert('CSRF token未找到，请刷新页面重试');
+                    return;
+                }
+                console.log('CSRF token:', csrfToken.value);
+                // change
+                fetch('/delete_task/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken.value,
+                    },
+                    body: JSON.stringify({ task_id: parseInt(taskId) }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    // 删除成功后移除任务卡片
+                    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+                    if (taskCard) {
+                        taskCard.style.transform = 'scale(0.8)';
+                        taskCard.style.opacity = '0';
+                        setTimeout(() => {
+                            taskCard.remove();
+                            // 检查是否还有任务，如果没有显示空状态
+                            const taskGrid = document.querySelector('.task-grid');
+                            if (taskGrid.children.length === 0) {
+                                taskGrid.innerHTML = `
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📅</div>
+                                        <p>暂无每日任务</p>
+                                        <small>点击右上角的 + 号添加新任务</small>
+                                    </div>
+                                `;
+                            }
+                        }, 300);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (error.error) {
+                        alert('删除失败：' + error.error);
+                    } else {
+                        alert('删除失败，请稍后重试');
+                    }
+                });
+            }
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('user-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

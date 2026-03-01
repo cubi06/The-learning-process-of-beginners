@@ -1,0 +1,1103 @@
+/* 待办事项页面现代化样式 */
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* 导航栏样式 */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.nav-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* 用户菜单样式 */
+.user-menu {
+    position: relative;
+}
+
+.user-info-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.user-info-nav:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.user-avatar-nav {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.user-name-nav {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.user-info-nav.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    min-width: 160px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+}
+
+.dropdown-item:last-child {
+    color: #f44336;
+}
+
+.dropdown-item:last-child:hover {
+    background: #ffebee;
+}
+
+.dropdown-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+/* 主要内容区域 */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    min-height: calc(100vh - 100px);
+}
+
+/* 用户侧边栏 */
+.user-sidebar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 16px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-bottom: 25px;
+}
+
+.user-profile:hover {
+    transform: translateY(-2px);
+}
+
+.user-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.user-level {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* 状态图表容器 */
+.stats-container {
+    margin-bottom: 25px;
+}
+
+.stat-chart {
+    height: 60px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* 快捷导航 */
+.quick-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #666;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+/* 待办统计 */
+.todo-stats {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.todo-stats h4 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 16px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-icon {
+    font-size: 20px;
+    width: 30px;
+    text-align: center;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+}
+
+/* 主要内容区域 */
+.main-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 页面标题 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.header-left h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.page-description {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.section-title h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.view-toggle {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-toggle:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.view-toggle.active {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+}
+
+.view-icon {
+    font-size: 16px;
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* 列表视图样式 */
+.todo-grid.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.todo-grid.list-view .todo-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.todo-grid.list-view .todo-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+}
+
+/* 移除了列表视图中的todo-header样式 */
+
+.todo-grid.list-view .todo-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.todo-grid.list-view .todo-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.todo-grid.list-view .todo-date {
+    font-size: 14px;
+    color: #666;
+}
+
+.todo-grid.list-view .todo-status {
+    margin-left: 15px;
+}
+
+/* 待办事项容器 */
+.todo-container {
+    margin-bottom: 40px;
+}
+
+.todo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.todo-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.todo-grid.list-view .todo-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.todo-grid.list-view .todo-content {
+    flex: 1;
+    margin: 0 20px;
+}
+
+/* 待办事项卡片 */
+.todo-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.todo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-color: #667eea;
+}
+
+.todo-card.completed {
+    opacity: 0.7;
+    background: #f8f9fa;
+}
+
+.todo-card.completed .todo-title {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* 移除了todo-header样式 */
+
+/* 移除了复选框相关样式 */
+
+/* 移除了优先级显示样式 */
+
+.todo-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #f5f5f5;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.action-btn:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+.edit-btn:hover {
+    background: #e3f2fd;
+}
+
+.delete-btn:hover {
+    background: #ffebee;
+}
+
+/* 待办内容 */
+.todo-content {
+    margin-bottom: 20px;
+}
+
+.todo-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.todo-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.todo-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #666;
+}
+
+.meta-item.completed {
+    color: #4CAF50;
+}
+
+.meta-item.overdue {
+    color: #F44336;
+}
+
+.meta-item.pending {
+    color: #FF9800;
+}
+
+.meta-icon {
+    font-size: 14px;
+}
+
+.meta-text {
+    font-weight: 500;
+}
+
+/* 移除了待办底部、标签和进度条相关样式 */
+
+/* 空状态 */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.empty-state p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.btn-add-empty {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-empty:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* 时间轴部分 */
+.timeline-section {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 30px;
+}
+
+.section-header {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.section-header h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.timeline-chart {
+    width: 100%;
+    height: 300px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close {
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    padding: 0 30px;
+}
+
+.form-group:first-of-type {
+    margin-top: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input[readonly] {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.user-stats-modal {
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 500;
+    color: #333;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 25px 30px;
+    border-top: 1px solid #eee;
+}
+
+.btn-cancel,
+.btn-submit {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* 注销模态框样式 */
+.logout-modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.logout-header {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    padding: 20px;
+    border-radius: 16px 16px 0 0;
+}
+
+.logout-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.logout-message {
+    text-align: center;
+}
+
+.logout-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.logout-message h4 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.logout-message p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 0 30px 30px;
+}
+
+.btn-logout {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: 250px 1fr;
+        gap: 20px;
+    }
+
+    .todo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+    }
+
+    .nav-menu {
+        margin-top: 15px;
+        gap: 20px;
+    }
+
+    .main-container {
+        grid-template-columns: 1fr;
+        padding: 20px 15px;
+    }
+
+    .user-sidebar {
+        position: static;
+        margin-bottom: 20px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .view-controls {
+        align-self: flex-end;
+    }
+
+    .todo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-chart {
+        height: 250px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-title {
+        font-size: 18px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .todo-card {
+        padding: 20px;
+    }
+
+    /* 移除了响应式todo-header样式 */
+
+    .todo-actions {
+        order: -1;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .todo-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* 移除了待办底部和进度条的响应式样式 */
+
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .view-controls {
+        align-self: center;
+    }
+
+    .view-toggle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .view-icon {
+        font-size: 14px;
+    }
+
+    /* 列表视图在小屏幕上的优化 */
+    .todo-grid.list-view .todo-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* 移除了小屏幕列表视图中的todo-header样式 */
+
+    .todo-grid.list-view .todo-meta {
+        width: 100%;
+        justify-content: space-between;
+        margin-left: 0;
+    }
+
+    .todo-grid.list-view .todo-status {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}

@@ -1,0 +1,834 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+<title>趣智任务管理</title>
+</head>
+
+<body>
+<!-- 成功提示 -->
+<!-- change -->
+<!-- 
+{% comment %}
+{% if success %}
+<div class="success-toast" id="successToast">
+    <div class="toast-content">
+        <span class="toast-icon">🎉</span>
+        <span class="toast-message">{{ success }}</span>
+        <button class="toast-close" onclick="closeSuccessToast()">&times;</button>
+    </div>
+</div>
+{% endif %} 
+{% endcomment %}
+-->
+
+<!-- 导航栏 -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+            <span class="nav-title">趣智任务管理</span>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/home/" class="nav-link active">首页</a></li>
+            <!-- change -->
+             <li><a href="/visualization/" class="nav-link">任务</a></li>
+<!--            <li><a href="#" class="nav-link">任务</a></li>-->
+        </ul>
+
+        <!-- 用户菜单 -->
+        <div class="user-menu">
+            <div class="user-info-nav" onclick="toggleUserDropdown()">
+                <img src="{% static 'img/li1.png' %}" alt="用户头像" class="user-avatar-nav">
+                <!-- change -->
+                 <span class="user-name-nav">{{ user.name }}</span>
+<!--                <span class="user-name-nav">小白</span>-->
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-item" onclick="showDialog()">
+                    <span class="dropdown-icon">👤</span>
+                    <span>个人信息</span>
+                </div>
+                <div class="dropdown-item" onclick="showLogoutConfirm()">
+                    <span class="dropdown-icon">🚪</span>
+                    <span>退出登录</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<div class="main-container">
+    <!-- 用户信息卡片 -->
+    <div class="user-card">
+        <div class="user-avatar">
+            <img src="{% static 'img/li1.png' %}" alt="用户头像">
+        </div>
+        <div class="user-info">
+            <!-- change -->
+<!--            <h2 class="user-name">小白</h2>-->
+              <h2 class="user-name">{{user.name}}</h2>
+            <p class="user-level">任务管理专家</p>
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-label">任务完成</span>
+                    <div class="stat-bar" id="task-progress">
+                        <!-- change -->
+                         <div class="stat-fill" style="width: {% if total_tasks > 0 %}{% widthratio completed_task_today total_tasks 100 %}{% else %}0{% endif %}%"></div>
+<!--                        <div class="stat-fill" style="width: 0cqb"></div>-->
+                        <!-- {# <span class="stat-value">{{ completed_tasks_today }}/{{ total_tasks }}</span> #}-->
+                        <span class="stat-value">{{completed_task_today}}/{{total_tasks}}</span>
+
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">待办完成</span>
+                    <div class="stat-bar" id="todo-progress">
+                        <!-- change -->
+                         <div class="stat-fill exp-fill" style="width: {% if total_todos > 0 %}{% widthratio completed_todos total_todos 100 %}{% else %}0{% endif %}%"></div>
+<!--                        <div class="stat-fill exp-fill" style="width: 0%"></div>-->
+                          <span class="stat-value">{{ completed_todos }}/{{ total_todos }}</span>
+<!--                        <span class="stat-value">0/0</span>-->
+                    </div>
+                </div>
+                <div class="user-resources">
+                    <!-- change -->
+                     <span class="resource-item">📋 总任务: {{ user.tasks.count }}</span>
+<!--                    <span class="resource-item">📋 总任务: 0</span>-->
+                    <span class="resource-item">📝 总待办: {{ user.todos.count }}</span>
+<!--                    <span class="resource-item">📝 总待办: 0</span>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务网格布局 -->
+    <div class="tasks-grid">
+        <!-- 1. 习惯 -->
+        <div class="task-section">
+            <div class="section-header">
+                <h3 class="section-title">🔄 习惯</h3>
+                <button class="add-btn" id="add-habit-1" style="visibility: hidden;">
+                    <img src="{% static 'img/Icon.png' %}" alt="添加">
+                </button>
+            </div>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-content">
+                        <h4 class="task-name">一定早起</h4>
+                        <p class="task-date" id="today-1">今天</p>
+                    </div>
+                    <input class="task-checkbox" type="checkbox" name="get-up-early" value="task">
+                </div>
+                <div class="task-item">
+                    <div class="task-content">
+                        <h4 class="task-name">喝水2L</h4>
+                        <p class="task-date" id="today-2">今天</p>
+                    </div>
+                    <input class="task-checkbox" type="checkbox" name="drink" value="task">
+                </div>
+                <div class="task-item">
+                    <div class="task-content">
+                        <h4 class="task-name">坚持早睡</h4>
+                        <p class="task-date" id="today-3">今天</p>
+                    </div>
+                    <input class="task-checkbox" type="checkbox" name="sleep-early" value="task">
+                </div>
+                <div class="task-item">
+                    <div class="task-content">
+                        <h4 class="task-name">省吃俭用</h4>
+                        <p class="task-date" id="today-4">今天</p>
+                    </div>
+                    <input class="task-checkbox" type="checkbox" name="save-money" value="task">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 每日任务 -->
+        <div class="task-section">
+            <div class="section-header">
+                <h3 class="section-title">📅 每日任务</h3>
+                <button class="add-btn" id="add-1">
+                    <img src="{% static 'img/Icon.png' %}" alt="添加">
+                </button>
+            </div>
+            <div class="task-list" id="tasks-list">
+                <!-- 显示每日任务（数据库查询） -->
+                <!-- change -->
+
+                {% for item in user.tasks.all %}
+                    <div class="task-item" data-index="{{ forloop.counter }}" {% if item.id in completed_task_ids %}style="opacity: 0.6;"{% endif %}>
+                        <div class="task-content" {% if item.id in completed_task_ids %}style="text-decoration: line-through;"{% endif %}>
+                            <h4 class="task-name">{{item.name}}</h4>
+                            <p class="task-date">{{item.begin}} 至 {{item.end}}</p>
+                        </div>
+                        <input class="task-checkbox" type="checkbox" name="{{ item.id }}" value="task"
+                               {% if item.id in completed_task_ids %}checked disabled{% endif %}
+                               onchange="handleTaskChange('{{ item.id }}')">
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <p>暂无每日任务</p>
+                        <small>点击右上角的 + 号添加新任务</small>
+                    </div>
+                {% endfor %}
+<!--                <div class="task-item" data-index="0" style="opacity: 0.6;">-->
+<!--                    <div class="task-content" style="text-decoration: line-through;">-->
+<!--                        <h4 class="task-name">任务1</h4>-->
+<!--                        <p class="task-date">2025年8月21日 至 2025年8月21日</p>-->
+<!--                    </div>-->
+<!--                    <input class="task-checkbox" type="checkbox" name="1" value="task" checked disabled onchange="handleTaskChange('1')">-->
+<!--                </div>-->
+
+<!--                <div class="task-item" data-index="1">-->
+<!--                    <div class="task-content">-->
+<!--                        <h4 class="task-name">任务2</h4>-->
+<!--                        <p class="task-date">2025年8月21日 至 2025年8月21日</p>-->
+<!--                    </div>-->
+<!--                    <input class="task-checkbox" type="checkbox" name="2" value="task"-->
+<!--                            onchange="handleTaskChange('2')">-->
+<!--                </div>-->
+
+
+            </div>
+            <!-- change -->
+
+            {% if user.tasks.all.count > 0 %}
+                <div class="task-summary">
+                    共 {{ user.tasks.all.count }} 个任务
+                </div>
+            {% endif %} 
+
+<!--            <div class="task-summary">-->
+<!--&lt;!&ndash;                共 2 个任务&ndash;&gt;-->
+<!--            </div>-->
+        </div>
+
+        <!-- 3. 待办事项 -->
+        <div class="task-section">
+            <div class="section-header">
+                <h3 class="section-title">📝 待办事项</h3>
+                <button class="add-btn" id="add-2">
+                    <img src="{% static 'img/Icon.png' %}" alt="添加">
+                </button>
+            </div>
+
+            <div class="task-list" id="todos-list">
+                <!-- change -->
+                {% for item in all_todos %}
+                    <div class="task-item" data-index="{{ forloop.counter }}" {% if item.state == 1 %}style="opacity: 0.6;"{% endif %}>
+                        <div class="task-content" {% if item.state == 1 %}style="text-decoration: line-through;"{% endif %}>
+                            <h4 class="task-name">{{ item.name }}</h4>
+                            <p class="task-date">{{ item.date }}</p>
+                        </div>
+                        <input class="task-checkbox" type="checkbox" name="todo{{ item.id }}" value="task"
+                               {% if item.state == 1 %}checked disabled{% endif %}
+                               onchange="handleTodoChange('{{ item.id }}')">
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>暂无待办事项</p>
+                        <small>点击右上角的 + 号添加新待办</small>
+                    </div>
+                {% endfor %}
+<!--                <div class="task-item" data-index="0" style="opacity: 0.6;">-->
+<!--                    <div class="task-content" style="text-decoration: line-through;">-->
+<!--                        <h4 class="task-name">待办1</h4>-->
+<!--                        <p class="task-date">2025年8月31日</p>-->
+<!--                    </div>-->
+<!--                    <input class="task-checkbox" type="checkbox" name="todo1" value="task" checked disabled onchange="handleTodoChange('1')">-->
+<!--                </div>-->
+
+<!--                <div class="task-item" data-index="1">-->
+<!--                    <div class="task-content">-->
+<!--                        <h4 class="task-name">待办2</h4>-->
+<!--                        <p class="task-date">2025年8月31日</p>-->
+<!--                    </div>-->
+<!--                    <input class="task-checkbox" type="checkbox" name="todo2" value="task" onchange="handleTodoChange('2')">-->
+<!--                </div>-->
+
+
+            </div>
+            <!-- change -->
+
+            {% if undo.all.count > 0 %}
+                <div class="task-summary">
+                    共 {{ undo.all.count }} 个待办事项
+                </div>
+            {% endif %} 
+
+<!--            <div class="task-summary">-->
+<!--                共 1 个待办事项-->
+<!--            </div>-->
+
+
+        </div>
+
+
+    </div>
+
+    <!-- 5. 你的伙伴 -->
+    <div class="partners-section">
+        <h2 class="partners-title">🤝 你的伙伴</h2>
+        <div class="partners-grid">
+            <!-- change -->
+              <div class="partner-card" onclick="window.location.href='/npcchoice/0/'">
+<!--            <div class="partner-card" onclick="window.location.href='#'">-->
+                <img src="{% static 'img/fulilian.png' %}" alt="芙莉莲">
+                <div class="partner-info">
+                    <h4>芙莉莲</h4>
+                    <p class="affection">好感度: 40</p>
+                </div>
+            </div>
+            <!-- change -->
+             <div class="partner-card" onclick="window.location.href='/npcchoice/1/'">
+<!--            <div class="partner-card" onclick="window.location.href='#'">-->
+                <img src="{% static 'img/xin.png' %}" alt="辛">
+                <div class="partner-info">
+                    <h4>辛</h4>
+                    <p class="affection">好感度: 20</p>
+                </div>
+            </div>
+            <!-- change -->
+              <div class="partner-card" onclick="window.location.href='/npcchoice/2/'">
+<!--            <div class="partner-card" onclick="window.location.href='#'">-->
+                <img src="{% static 'img/feilun.png' %}" alt="费伦">
+                <div class="partner-info">
+                    <h4>费伦</h4>
+                    <p class="affection">好感度: 40</p>
+                </div>
+            </div>
+
+            <!-- change -->
+             <div class="partner-card" onclick="window.location.href='/npcchoice/3/'">
+<!--            <div class="partner-card" onclick="window.location.href='#'">-->
+                <img src="{% static 'img/stark.png' %}" alt="史塔克">
+                <div class="partner-info">
+                    <h4>史塔克</h4>
+                    <p class="affection">好感度: 40</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 对话框 -->
+    <!-- 新建任务对话框 -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新任务</h3>
+                <span class="close" onclick="closeModal('task-modal')">&times;</span>
+            </div>
+            <!-- change -->
+             <form method="post" action="/newtasks/">
+<!--            <form method="post" action="#">-->
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>任务名称：</label>
+                    <input type="text" name="name" placeholder="请输入任务名称" required>
+                </div>
+                <div class="form-group">
+                    <label>开始时间：</label>
+                    <input type="date" name="begin" required>
+                </div>
+                <div class="form-group">
+                    <label>结束时间：</label>
+                    <input type="date" name="end" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('task-modal')" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新建待办对话框 -->
+    <div class="modal" id="todo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新待办</h3>
+                <span class="close" onclick="closeModal('todo-modal')">&times;</span>
+            </div>
+            <!-- change -->
+              <form method="post" action="/newtodos/">
+<!--            <form method="post" action="#">-->
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>待办名称：</label>
+                    <input type="text" name="name" placeholder="请输入待办事项" required>
+                </div>
+                <div class="form-group">
+                    <label>截止时间：</label>
+                    <input type="date" name="date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('todo-modal')" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 用户信息对话框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <!-- change -->
+             <form method="post" action="/infochange/">
+<!--            <form method="post" action="#">-->
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <!-- change -->
+                     <input type="text" value="{{ user.id }}" readonly>
+<!--                    <input type="text" value="0" readonly>-->
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <!-- change -->
+                     <input type="text" name="uname" value="{{ user.name }}" required>
+<!--                    <input type="text" value="小白" readonly>-->
+
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注销确认模态框 -->
+    <div class="modal" id="logout-modal">
+        <div class="modal-content logout-modal-content">
+            <div class="modal-header logout-header">
+                <h3>🚪 确认退出</h3>
+            </div>
+            <div class="modal-body">
+                <div class="logout-message">
+                    <div class="logout-icon">👋</div>
+                    <h4>确定要退出登录吗？</h4>
+                    <p>退出后您需要重新登录才能继续使用系统</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeLogoutConfirm()">取消</button>
+                <button class="btn-logout" onclick="confirmLogout()">确认退出</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+// 日期更新
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const dateStr = today.getFullYear() + '年' +
+                   String(today.getMonth() + 1).padStart(2, '0') + '月' +
+                   String(today.getDate()).padStart(2, '0') + '日';
+
+    document.querySelectorAll('[id^="today-"]').forEach(element => {
+        element.textContent = dateStr;
+    });
+});
+
+// 模态框控制
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// 用户信息对话框功能
+function showDialog() {
+    document.getElementById("user-modal").style.display = "block";
+}
+
+function closeDialog() {
+    document.getElementById("user-modal").style.display = "none";
+}
+
+// 添加按钮事件
+document.getElementById('add-1').addEventListener('click', () => openModal('task-modal'));
+document.getElementById('add-2').addEventListener('click', () => openModal('todo-modal'));
+
+// 滚动检测功能
+function initScrollDetection() {
+    const taskLists = document.querySelectorAll('.task-list');
+
+    taskLists.forEach(list => {
+        list.addEventListener('scroll', function() {
+            // 检测是否滚动
+            if (this.scrollTop > 10) {
+                this.classList.add('scrolled');
+            } else {
+                this.classList.remove('scrolled');
+            }
+
+            // 检测是否滚动到底部
+            if (this.scrollTop + this.clientHeight >= this.scrollHeight - 10) {
+                this.classList.add('scrolled-bottom');
+            } else {
+                this.classList.remove('scrolled-bottom');
+            }
+        });
+    });
+}
+
+// 处理待办事项状态变化
+function handleTodoChange(todoId) {
+    const checkbox = document.querySelector(`input[name="todo${todoId}"]`);
+    const taskItem = checkbox.closest('.task-item');
+
+    if (checkbox.checked) {
+        console.log('待办事项' + todoId + '状态已更改！');
+        checkbox.disabled = true;
+
+        // 添加完成样式
+        taskItem.style.opacity = '0.6';
+        taskItem.querySelector('.task-content').style.textDecoration = 'line-through';
+
+        alert("待办事项已完成！");
+        // change
+        fetch("/task-complete/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({ task_id: 0, todo_id: parseInt(todoId) }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // 显示完成动画
+            taskItem.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                taskItem.style.transform = 'scale(1)';
+                // 延迟跳转到home页面
+                window.location.href = '/home/';
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // 如果是重复完成错误，恢复checkbox状态
+            if (error.error) {
+                alert(error.error);
+                checkbox.checked = false;
+                checkbox.disabled = false;
+                taskItem.style.opacity = '1';
+                taskItem.querySelector('.task-content').style.textDecoration = 'none';
+            }
+        });
+
+    } else {
+        // 取消完成（这个逻辑在当前设计中不应该被触发，因为已完成的checkbox是disabled的）
+        taskItem.style.opacity = '1';
+        taskItem.querySelector('.task-content').style.textDecoration = 'none';
+        checkbox.disabled = false;
+        console.log(`待办事项 ${todoId} 取消完成`);
+    }
+}
+
+// 用户菜单控制
+function toggleUserDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    const userInfo = document.querySelector('.user-info-nav');
+
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        userInfo.classList.remove('active');
+    } else {
+        dropdown.classList.add('show');
+        userInfo.classList.add('active');
+    }
+}
+
+// 点击外部关闭用户菜单
+document.addEventListener('click', function(event) {
+    const userMenu = document.querySelector('.user-menu');
+    const dropdown = document.getElementById('userDropdown');
+    const userInfo = document.querySelector('.user-info-nav');
+
+    if (!userMenu.contains(event.target)) {
+        dropdown.classList.remove('show');
+        userInfo.classList.remove('active');
+    }
+});
+
+// 显示注销确认
+function showLogoutConfirm() {
+    // 先关闭用户菜单
+    const dropdown = document.getElementById('userDropdown');
+    const userInfo = document.querySelector('.user-info-nav');
+    dropdown.classList.remove('show');
+    userInfo.classList.remove('active');
+
+    // 显示注销确认模态框
+    document.getElementById('logout-modal').style.display = 'block';
+}
+
+// 关闭注销确认
+function closeLogoutConfirm() {
+    document.getElementById('logout-modal').style.display = 'none';
+}
+
+// 确认注销
+function confirmLogout() {
+    // 显示加载状态
+    const logoutBtn = document.querySelector('.btn-logout');
+    const originalText = logoutBtn.textContent;
+    logoutBtn.textContent = '退出中...';
+    logoutBtn.disabled = true;
+
+    // 跳转到注销页面
+    // change
+    setTimeout(() => {
+        window.location.href = '/logout/';
+    }, 1000);
+}
+
+// 任务完成处理函数
+function handleTaskChange(taskId) {
+    const checkbox = document.getElementsByName(taskId)[0];
+    const taskItem = checkbox.closest('.task-item');
+
+    if (checkbox.checked) {
+        console.log('任务' + taskId + '状态已更改！');
+        checkbox.disabled = true;
+
+        // 添加完成样式
+        taskItem.style.opacity = '0.6';
+        taskItem.querySelector('.task-content').style.textDecoration = 'line-through';
+
+        alert("任务已完成！");
+        // change   
+        fetch("/task-complete/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({ task_id: parseInt(taskId), todo_id: 0 }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // 显示完成动画
+            taskItem.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                taskItem.style.transform = 'scale(1)';
+                // 延迟跳转到home页面
+                window.location.href = '/home/';
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // 如果是重复完成错误，恢复checkbox状态
+            if (error.error) {
+                alert(error.error);
+                checkbox.checked = false;
+                checkbox.disabled = false;
+                taskItem.style.opacity = '1';
+                taskItem.querySelector('.task-content').style.textDecoration = 'none';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            checkbox.disabled = false;
+            taskItem.style.opacity = '1';
+            taskItem.querySelector('.task-content').style.textDecoration = 'none';
+        });
+    }
+}
+
+// 关闭成功提示
+function closeSuccessToast() {
+    const toast = document.getElementById('successToast');
+    if (toast) {
+        toast.style.animation = 'slideOutRight 0.5s ease';
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }
+}
+
+// 自动关闭成功提示和初始化滚动检测
+document.addEventListener('DOMContentLoaded', function() {
+    const successToast = document.getElementById('successToast');
+    if (successToast) {
+        setTimeout(() => {
+            closeSuccessToast();
+        }, 5000); // 5秒后自动关闭
+    }
+
+    // 初始化滚动检测
+    initScrollDetection();
+});
+
+// 点击模态框外部关闭
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+// 进度条tooltip功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 计算百分比
+    const taskTotal = parseInt('{{ total_tasks }}') || 0;
+    const taskFinished = parseInt('{{ completed_tasks_today }}') || 0;
+    const todoTotal = parseInt('{{ total_todos }}') || 0;
+    const todoFinished = parseInt('{{ completed_todos }}') || 0;
+
+    const taskPercentage = taskTotal > 0 ? Math.round((taskFinished / taskTotal) * 100) : 0;
+    const todoPercentage = todoTotal > 0 ? Math.round((todoFinished / todoTotal) * 100) : 0;
+
+    // 创建tooltip元素
+    const tooltip = document.createElement('div');
+    tooltip.className = 'progress-tooltip';
+    tooltip.style.cssText = `
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        z-index: 9999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: none;
+    `;
+    document.body.appendChild(tooltip);
+
+    // 任务进度条事件
+    const taskProgress = document.getElementById('task-progress');
+    if (taskProgress) {
+        taskProgress.addEventListener('mouseenter', function(e) {
+            tooltip.textContent = `${taskPercentage}% (${taskFinished}/${taskTotal})`;
+            tooltip.style.display = 'block';
+            tooltip.style.opacity = '1';
+        });
+
+        taskProgress.addEventListener('mousemove', function(e) {
+            const rect = taskProgress.getBoundingClientRect();
+            tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+        });
+
+        taskProgress.addEventListener('mouseleave', function() {
+            tooltip.style.opacity = '0';
+            setTimeout(() => tooltip.style.display = 'none', 300);
+        });
+    }
+
+    // 待办进度条事件
+    const todoProgress = document.getElementById('todo-progress');
+    if (todoProgress) {
+        todoProgress.addEventListener('mouseenter', function(e) {
+            tooltip.textContent = `${todoPercentage}% (${todoFinished}/${todoTotal})`;
+            tooltip.style.display = 'block';
+            tooltip.style.opacity = '1';
+        });
+
+        todoProgress.addEventListener('mousemove', function(e) {
+            const rect = todoProgress.getBoundingClientRect();
+            tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+        });
+
+        todoProgress.addEventListener('mouseleave', function() {
+            tooltip.style.opacity = '0';
+            setTimeout(() => tooltip.style.display = 'none', 300);
+        });
+    }
+});
+
+// 更新任务完成进度条
+function updateTaskProgress() {
+    // change
+    // {# const taskTotal = parseInt('{{ total_tasks }}') || 0; #}
+    const taskTotal = parseInt('0') || 0;
+    // change
+    // {# let taskFinished = parseInt('{{ completed_tasks_today }}') || 0; #}
+    let taskFinished = parseInt('0') || 0;
+
+    // 增加完成数量
+    taskFinished += 1;
+
+    // 计算新的百分比
+    const taskPercentage = taskTotal > 0 ? Math.round((taskFinished / taskTotal) * 100) : 0;
+
+    // 更新进度条
+    const taskProgressBar = document.querySelector('#task-progress .stat-fill');
+    const taskProgressValue = document.querySelector('#task-progress .stat-value');
+
+    if (taskProgressBar && taskProgressValue) {
+        taskProgressBar.style.width = taskPercentage + '%';
+        taskProgressValue.textContent = `${taskFinished}/${taskTotal}`;
+    }
+}
+
+// 更新待办完成进度条
+function updateTodoProgress() {
+    // change
+    // {# const todoTotal = parseInt('{{ total_todos }}') || 0; #}
+    const todoTotal = parseInt('0') || 0;
+    // change
+    // {# let todoFinished = parseInt('{{ completed_todos }}') || 0; #}
+    let todoFinished = parseInt('0') || 0;
+
+    // 增加完成数量
+    todoFinished += 1;
+
+    // 计算新的百分比
+    const todoPercentage = todoTotal > 0 ? Math.round((todoFinished / todoTotal) * 100) : 0;
+
+    // 更新进度条
+    const todoProgressBar = document.querySelector('#todo-progress .stat-fill');
+    const todoProgressValue = document.querySelector('#todo-progress .stat-value');
+
+    if (todoProgressBar && todoProgressValue) {
+        todoProgressBar.style.width = todoPercentage + '%';
+        todoProgressValue.textContent = `${todoFinished}/${todoTotal}`;
+    }
+}
+</script>
+
+</body>
+</html>

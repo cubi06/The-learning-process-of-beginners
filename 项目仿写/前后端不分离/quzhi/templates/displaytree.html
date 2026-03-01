@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/displaytree.css' %}">
+    <title>事件总览 - 趣智系统</title>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+                <span class="nav-title">趣智任务管理</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/home/" class="nav-link">首页</a></li>
+                <li><a href="/visualization/" class="nav-link">任务</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-container">
+        <!-- 用户状态侧边栏 -->
+        <aside class="user-sidebar">
+            <div class="user-profile" onclick="showDialog()">
+                <div class="user-avatar">
+                    <img src="{% static 'img/li1.png' %}" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <h3 class="user-name">{{user.name}}</h3>
+                    <p class="user-level">任务管理专家</p>
+                </div>
+            </div>
+
+
+
+            <!-- 快捷导航 -->
+            <nav class="quick-nav">
+                <a href="/visualization/" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>任务</span>
+                </a>
+                <a href="/visualization/displaytree/" class="nav-item active">
+                    <div class="nav-icon">🌳</div>
+                    <span>事件总览</span>
+                </a>
+
+                <a href="/visualization/pinechart/" class="nav-item">
+                    <div class="nav-icon">📈</div>
+                    <span>完成情况</span>
+                </a>
+            </nav>
+
+            <!-- 统计信息 -->
+            <div class="stats-summary">
+                <h4>📊 数据统计</h4>
+                <div class="stat-item">
+                    <span class="stat-label">总任务数</span>
+                    <span class="stat-value">{{ user.tasks.count }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">待办事项</span>
+                    <span class="stat-value">{{ user.todos.count }}</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1 class="page-title">🌳 事件总览</h1>
+                <p class="page-description">查看您的任务和待办事项的关系图谱</p>
+            </div>
+
+            <!-- 控制面板 -->
+            <div class="control-panel">
+                <div class="view-controls">
+                    <button class="control-btn active" data-layout="radial">
+                        <span class="btn-icon">🎯</span>
+                        <span>径向布局</span>
+                    </button>
+                    <button class="control-btn" data-layout="orthogonal">
+                        <span class="btn-icon">📊</span>
+                        <span>正交布局</span>
+                    </button>
+                </div>
+
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoom-in">🔍+</button>
+                    <button class="zoom-btn" id="zoom-out">🔍-</button>
+                    <button class="zoom-btn" id="reset-zoom">🎯</button>
+                </div>
+            </div>
+
+            <!-- 关系图谱容器 -->
+            <div class="chart-container">
+                <div id="relationship-chart" class="relationship-chart"></div>
+
+                <!-- 图例 -->
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #667eea;"></div>
+                        <span>用户中心</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4CAF50;"></div>
+                        <span>每日任务</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FF9800;"></div>
+                        <span>待办事项</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #E91E63;"></div>
+                        <span>具体项目</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 用户信息对话框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <form method="post" action="/infochange/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <input type="text" value="{{ user.id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <input type="text" name="uname" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/echarts.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <script>
+        let myChart;
+        let currentLayout = 'radial';
+
+        // 用户对话框控制
+        function showDialog() {
+            document.getElementById("user-modal").style.display = "block";
+        }
+
+        function closeDialog() {
+            document.getElementById("user-modal").style.display = "none";
+        }
+
+
+
+        // 现代化配色方案
+        const modernColors = [
+            "#667eea", "#764ba2", "#4CAF50", "#FF9800",
+            "#E91E63", "#9C27B0", "#2196F3", "#00BCD4",
+            "#8BC34A", "#FFEB3B", "#FF5722", "#795548"
+        ];
+
+        // 获取关系图数据
+        function getRelationshipData() {
+            let data = {
+                name: "{{ user.name }}",
+                value: 0,
+                children: [
+
+                ],
+                category: 0
+            };
+
+            // 待办事项分支
+            let todosBranch = {
+                name: "待办事项",
+                value: 1,
+                children: [
+                    // {
+                    //     name: "待办1",
+                    //     value: "todo-1",
+                    //     category: 2,
+                    //     itemStyle: {
+                    //         color: modernColors[2]
+                    //     }
+                    // },
+                    // {
+                    //     name: "待办2",
+                    //     value: "todo-2",
+                    //     category: 2,
+                    //     itemStyle: {
+                    //         color: modernColors[3]
+                    //     }
+                    // }
+                ],
+                category: 1
+            };
+
+            let todoIndex = 1;
+
+            {% for todo in user.todos.all %}
+                let todo_{{ todo.id }} = {
+                    name: "{{ todo.name }}",
+                    value: "todo-{{ todo.id }}",
+                    category: 2,
+                    itemStyle: {
+                        color: modernColors[2 + (todoIndex % 4)]
+                    }
+                };
+                todosBranch.children.push(todo_{{ todo.id }});
+                todoIndex++;
+            {% endfor %}
+
+            // 每日任务分支
+            let tasksBranch = {
+                name: "每日任务",
+                value: 2,
+                children: [
+                    // {
+                    //     name: "任务1",
+                    //     value: "todo-1",
+                    //     category: 2,
+                    //     itemStyle: {
+                    //         color: modernColors[2]
+                    //     }
+                    // },
+                    // {
+                    //     name: "任务2",
+                    //     value: "todo-2",
+                    //     category: 2,
+                    //     itemStyle: {
+                    //         color: modernColors[3]
+                    //     }
+                    // }
+                ],
+                category: 1
+            };
+
+            let taskIndex = 1;
+            {% for task in user.tasks.all %}
+                let task_{{ task.id }} = {
+                    name: "{{ task.name }}",
+                    value: "task-{{ task.id }}",
+                    category: 2,
+                    itemStyle: {
+                        color: modernColors[6 + (taskIndex % 4)]
+                    }
+                };
+                tasksBranch.children.push(task_{{ task.id }});
+                taskIndex++;
+            {% endfor %}
+
+            data.children.push(todosBranch);
+            data.children.push(tasksBranch);
+
+            return processTreeData([data], 0);
+        }
+
+        // 处理树形数据
+        function processTreeData(data, level) {
+            return data.map((item, index) => {
+                // 设置节点大小
+                switch(level) {
+                    case 0: // 用户中心
+                        item.symbolSize = 80;
+                        item.itemStyle = { color: modernColors[0] };
+                        break;
+                    case 1: // 分类节点
+                        item.symbolSize = 60;
+                        item.itemStyle = { color: modernColors[index + 1] };
+                        break;
+                    default: // 具体项目
+                        item.symbolSize = 40;
+                        break;
+                }
+
+                // 设置标签样式
+                item.label = {
+                    show: true,
+                    position: level === 0 ? "inside" : "bottom",
+                    fontSize: level === 0 ? 16 : 12,
+                    fontWeight: level === 0 ? "bold" : "normal",
+                    color: level === 0 ? "#fff" : "#333"
+                };
+
+                // 递归处理子节点
+                if (item.children && item.children.length > 0) {
+                    item.children = processTreeData(item.children, level + 1);
+                }
+
+                return item;
+            });
+        }
+
+        // 初始化关系图
+        function initRelationshipChart() {
+            const dom = document.getElementById("relationship-chart");
+            myChart = echarts.init(dom);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 14
+                    },
+                    formatter: function(params) {
+                        return `<strong>${params.name}</strong><br/>类型: ${getCategoryName(params.data.category)}`;
+                    }
+                },
+                series: [{
+                    type: 'tree',
+                    data: getRelationshipData(),
+                    top: '10%',
+                    bottom: '10%',
+                    left: '10%',
+                    right: '10%',
+                    layout: currentLayout,
+                    symbol: 'circle',
+                    symbolSize: function(value, params) {
+                        return params.data.symbolSize || 40;
+                    },
+                    roam: true,
+                    expandAndCollapse: true,
+                    initialTreeDepth: 3,
+                    animationDuration: 1000,
+                    animationEasing: 'cubicOut',
+                    itemStyle: {
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    },
+                    lineStyle: {
+                        width: 3,
+                        curveness: 0.3,
+                        color: '#667eea',
+                        opacity: 0.7
+                    },
+                    emphasis: {
+                        focus: 'descendant',
+                        itemStyle: {
+                            borderWidth: 3,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(102, 126, 234, 0.5)'
+                        },
+                        lineStyle: {
+                            width: 4,
+                            opacity: 1
+                        }
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const categories = ['用户中心', '分类', '具体项目'];
+            return categories[category] || '未知';
+        }
+
+        // 切换布局
+        function switchLayout(layout) {
+            currentLayout = layout;
+            const option = myChart.getOption();
+            option.series[0].layout = layout;
+            myChart.setOption(option, true);
+
+            // 更新按钮状态
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-layout="${layout}"]`).classList.add('active');
+        }
+
+        // 缩放控制
+        function zoomChart(action) {
+            const option = myChart.getOption();
+            let zoom = option.series[0].zoom || 1;
+
+            switch(action) {
+                case 'in':
+                    zoom = Math.min(zoom * 1.2, 3);
+                    break;
+                case 'out':
+                    zoom = Math.max(zoom * 0.8, 0.3);
+                    break;
+                case 'reset':
+                    zoom = 1;
+                    break;
+            }
+
+            option.series[0].zoom = zoom;
+            myChart.setOption(option);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化关系图
+            setTimeout(initRelationshipChart, 100);
+
+            // 绑定控制按钮事件
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const layout = this.dataset.layout;
+                    switchLayout(layout);
+                });
+            });
+
+            // 绑定缩放按钮事件
+            document.getElementById('zoom-in').addEventListener('click', () => zoomChart('in'));
+            document.getElementById('zoom-out').addEventListener('click', () => zoomChart('out'));
+            document.getElementById('reset-zoom').addEventListener('click', () => zoomChart('reset'));
+        });
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('user-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

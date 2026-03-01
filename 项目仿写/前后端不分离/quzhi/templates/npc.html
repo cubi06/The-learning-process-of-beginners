@@ -1,0 +1,530 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- change -->
+     <title>{{ npc_name }} - 你的伙伴 | 趣知系统</title>
+<!--    <title>Feilen - 你的伙伴 | 趣知系统</title>-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/npc.css' %}">
+    <style>
+        /* 强制消息框自适应宽度 */
+        .message {
+            display: flex !important;
+            align-items: flex-start !important;
+        }
+
+        .message-content {
+            flex: 0 0 auto !important; /* 不扩展，不收缩，根据内容自动调整 */
+            max-width: 70% !important;
+            width: auto !important;
+        }
+
+        .message-text {
+            display: inline-block !important;
+            width: auto !important;
+            min-width: 60px !important;
+            max-width: 100% !important;
+            word-wrap: break-word !important;
+        }
+
+        .npc-message .message-content,
+        .user-message .message-content {
+            flex: 0 0 auto !important;
+            width: auto !important;
+        }
+
+        /* 确保头像不会影响消息宽度 */
+        .message-avatar {
+            flex: 0 0 auto !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+                <span class="nav-title">趣智任务管理</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/home/" class="nav-link">首页</a></li>
+                <li><a href="/visualization/" class="nav-link">任务</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-container">
+        <!-- 用户状态侧边栏 -->
+        <aside class="user-sidebar">
+            <div class="user-profile" onclick="showDialog()">
+                <div class="user-avatar">
+                    <img src="{% static 'img/li1.png' %}" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <!-- change -->
+                    <!-- {# <h3 class="user-name">{{user.name}}</h3> #} -->
+                    <h3 class="user-name">小白</h3>
+
+                    <p class="user-level">任务管理专家</p>
+                </div>
+            </div>
+
+
+
+            <!-- 快捷导航 -->
+            <nav class="quick-nav">
+                <a href="/home/" class="nav-item">
+                    <div class="nav-icon">🏠</div>
+                    <span>首页</span>
+                </a>
+                <a href="/visualization/" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>任务</span>
+                </a>
+                <a href="/visualization/displaytree/" class="nav-item">
+                    <div class="nav-icon">🌳</div>
+                    <span>事件总览</span>
+                </a>
+
+            </nav>
+        </aside>
+        <!-- NPC对话主区域 -->
+        <main class="chat-container">
+            <!-- NPC信息卡片 -->
+            <div class="npc-info-card">
+                <div class="npc-avatar-container">
+                    <!-- change -->
+                     {# <img class="npc-avatar" id="npc-avatar" alt="{{ npc_name }}"> #}
+<!--                    <img class="npc-avatar" id="npc-avatar" alt="Feilen">-->
+                    <div class="npc-status online"></div>
+                </div>
+                <div class="npc-details">
+                    <!-- change -->
+                      <h2 class="npc-name">{{ npc_name }}</h2>
+<!--                    <h2 class="npc-name">Feilen</h2>-->
+                    <p class="npc-role">你的AI伙伴</p>
+                    <div class="npc-tags">
+                        <span class="tag" id="npc-tag">智能助手</span>
+                    </div>
+                </div>
+                <div class="npc-actions">
+                    <button class="action-btn clear-chat-btn" onclick="clearChatHistory()" title="清除聊天记录">
+                        <span class="action-icon">🗑️</span>
+                    </button>
+                    <button class="info-toggle-btn" onclick="toggleNpcInfo()">
+                        <span class="info-icon">ℹ️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 对话区域 -->
+            <div class="chat-area">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- 显示聊天历史记录 -->
+                    <!-- change -->
+
+                    {% if chat_history %}
+                        {% for message in chat_history %}
+                            {% if message.message_type == 'user' %}
+                                <div class="message user-message">
+                                    <div class="message-content">
+                                        <div class="message-header">
+                                            <span class="sender-name">{{ user.name }}</span>
+                                            <span class="message-time">{{ message.timestamp|date:"m/d H:i" }}</span>
+                                        </div>
+                                        <div class="message-text">{{ message.content }}</div>
+                                    </div>
+                                    <div class="message-avatar">
+                                        <img src="{% static 'img/li1.png' %}" alt="{{ user.name }}">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="message npc-message">
+                                    <div class="message-avatar">
+                                        <img class="npc-small-avatar" src="" alt="{{ npc_name }}">
+                                    </div>
+                                    <div class="message-content">
+                                        <div class="message-header">
+                                            <span class="sender-name">{{ message.npc_name }}</span>
+                                            <span class="message-time">{{ message.timestamp|date:"m/d H:i" }}</span>
+                                        </div>
+                                        <div class="message-text">{{ message.content }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="welcome-message">
+                            <div class="welcome-icon">👋</div>
+                            <h3>欢迎与{{ npc_name }}对话！</h3>
+                            <p>开始你们的对话吧，{{ npc_name }}很期待与你交流。</p>
+                        </div>
+                    {% endif %}
+
+
+<!--                    <div class="message user-message">-->
+<!--                        <div class="message-content">-->
+<!--                            <div class="message-header">-->
+<!--                                <span class="sender-name">小白</span>-->
+<!--                                <span class="message-time">8/19 12:00</span>-->
+<!--                            </div>-->
+<!--                            <div class="message-text">你好</div>-->
+<!--                        </div>-->
+<!--                        <div class="message-avatar">-->
+<!--                            <img src="{% static 'img/li1.png' %}" alt="hi">-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="message npc-message">-->
+<!--                        <div class="message-avatar">-->
+<!--                            <img class="npc-small-avatar" src="" alt="Feilen">-->
+<!--                        </div>-->
+<!--                        <div class="message-content">-->
+<!--                            <div class="message-header">-->
+<!--                                <span class="sender-name">Feilen</span>-->
+<!--                                <span class="message-time">8/19 12:00</span>-->
+<!--                            </div>-->
+<!--                            <div class="message-text">你好</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+
+                </div> 
+
+
+                <!-- 输入区域 -->
+                <div class="chat-input-area">
+                    <!-- change -->
+                     <form method="post" action="/dialog/" class="chat-form" id="chat-form">
+<!--                    <form method="post" action="#" class="chat-form" id="chat-form">-->
+                        {% csrf_token %}
+                        <div class="input-container">
+                            <!-- change -->
+<!--                             placeholder="输入你想对说的话..."-->
+                            <textarea
+                                id="message-input"
+                                name="text"
+                                placeholder="输入你想对{{ npc_name }}说的话..."
+                                maxlength="200"
+                                rows="1"
+                                required
+                            ></textarea>
+                            <div class="input-actions">
+                                <span class="char-count">0/200</span>
+                                <button type="submit" class="send-btn" disabled>
+                                    <span class="send-icon">📤</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- NPC介绍面板 -->
+            <div class="npc-intro-panel" id="npc-intro-panel">
+                <div class="intro-header">
+                     {# <h3>{{ npc_name }}的介绍</h3> #}
+                    <h3>Feilen的介绍</h3>
+                    <button class="close-intro-btn" onclick="toggleNpcInfo()">×</button>
+                </div>
+                <div class="intro-content">
+                    <div class="intro-image">
+                          <img class="npc-large-image" id="npc-large-image" alt="{{ npc_name }}">
+<!--                        <img class="npc-large-image" id="npc-large-image" alt="Feilen">-->
+                    </div>
+                    <div class="intro-text" id="intro-text">
+                        <!-- 介绍文本将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+        </div>
+    <!-- 用户信息模态框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <form method="post" action="/infochange/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <input type="text" value="{{ user.id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <input type="text" name="uname" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注销确认模态框 -->
+    <div class="modal" id="logout-modal">
+        <div class="modal-content logout-modal-content">
+            <div class="modal-header logout-header">
+                <h3>🚪 确认退出</h3>
+            </div>
+            <div class="modal-body">
+                <div class="logout-message">
+                    <div class="logout-icon">👋</div>
+                    <h4>确定要退出登录吗？</h4>
+                    <p>退出后您需要重新登录才能继续使用系统</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeLogoutConfirm()">取消</button>
+                <button class="btn-logout" onclick="confirmLogout()">确认退出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // NPC数据配置
+        const npcData = {
+            0: {
+                name: 'Feilen',
+                image: "{% static 'img/fulilian.png' %}",
+                tag: '魔法师',
+                intro: '芙莉莲是一位拥有千年寿命的精灵魔法师，她曾经是勇者辛美尔队伍的一员。虽然外表看起来年轻，但她拥有丰富的魔法知识和人生阅历。'
+            },
+            1: {
+                name: 'Frieren',
+                image: "{% static 'img/xin.png' %}",
+                tag: '勇者',
+                intro: '辛美尔是传说中的勇者，他带领着队伍打败了魔王，拯救了世界。他是一个充满正义感和勇气的人，深受队友和人民的爱戴。'
+            },
+            2: {
+                name: 'Himmel',
+                image: "{% static 'img/feilun.png' %}",
+                tag: '僧侣',
+                intro: '海塔是队伍中的僧侣，负责治疗和支援。她性格温和善良，总是关心着队友的安危，是队伍中不可或缺的存在。'
+            },
+            3: {
+                name: 'Stark',
+                image: "{% static 'img/stark.png' %}",
+                tag: '战士',
+                intro: '史塔克是一位年轻的战士，虽然有时会显得胆怯，但在关键时刻总能展现出惊人的勇气和实力。他正在成长为一名真正的勇者。'
+            }
+        };
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // change
+            const npcId = {{ npc_id }};
+            // const npcId = 0;
+
+            const currentNpc = npcData[npcId];
+
+            if (currentNpc) {
+                // 设置NPC头像（包括聊天历史中的头像）
+                const avatars = document.querySelectorAll('#npc-avatar, #npc-small-avatar, #npc-large-image, .npc-small-avatar');
+                avatars.forEach(avatar => {
+                    if (avatar) avatar.src = currentNpc.image;
+                });
+
+                // 设置NPC标签
+                const tagElement = document.getElementById('npc-tag');
+                if (tagElement) tagElement.textContent = currentNpc.tag;
+
+                // 设置介绍文本
+                const introElement = document.getElementById('intro-text');
+                if (introElement) introElement.textContent = currentNpc.intro;
+            }
+
+
+
+            // 初始化输入框功能
+            initChatInput();
+
+            // 滚动到最新消息
+            scrollToBottom();
+        });
+
+        // 滚动到聊天区域底部
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+
+
+        // 用户菜单控制
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            const userInfo = document.querySelector('.user-info-nav');
+
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                userInfo.classList.remove('active');
+            } else {
+                dropdown.classList.add('show');
+                userInfo.classList.add('active');
+            }
+        }
+
+        // 显示用户信息对话框
+        function showDialog() {
+            document.getElementById("user-modal").style.display = "block";
+        }
+
+        function closeDialog() {
+            document.getElementById("user-modal").style.display = "none";
+        }
+
+        // 显示注销确认
+        function showLogoutConfirm() {
+            const dropdown = document.getElementById('userDropdown');
+            const userInfo = document.querySelector('.user-info-nav');
+            dropdown.classList.remove('show');
+            userInfo.classList.remove('active');
+
+            document.getElementById('logout-modal').style.display = 'block';
+        }
+
+        function closeLogoutConfirm() {
+            document.getElementById('logout-modal').style.display = 'none';
+        }
+
+        function confirmLogout() {
+            const logoutBtn = document.querySelector('.btn-logout');
+            logoutBtn.textContent = '退出中...';
+            logoutBtn.disabled = true;
+
+            setTimeout(() => {
+                window.location.href = '/logout/';
+            }, 1000);
+        }
+
+        // NPC介绍面板切换
+        function toggleNpcInfo() {
+            const panel = document.getElementById('npc-intro-panel');
+            panel.classList.toggle('show');
+        }
+
+        // 清除聊天记录
+        function clearChatHistory() {
+            if (confirm('确定要清除与{{ npc_name }}的所有聊天记录吗？此操作不可撤销。')) {
+                const clearBtn = document.querySelector('.clear-chat-btn');
+                const originalContent = clearBtn.innerHTML;
+
+                // 显示加载状态
+                clearBtn.innerHTML = '<span class="action-icon">⏳</span>';
+                clearBtn.disabled = true;
+                // change
+                fetch('/clear-chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 清除成功，刷新页面
+                        location.reload();
+                    } else {
+                        alert('清除失败：' + data.message);
+                        clearBtn.innerHTML = originalContent;
+                        clearBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('清除失败，请稍后再试');
+                    clearBtn.innerHTML = originalContent;
+                    clearBtn.disabled = false;
+                });
+            }
+        }
+
+        // 聊天输入功能
+        function initChatInput() {
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.querySelector('.send-btn');
+            const charCount = document.querySelector('.char-count');
+            const chatForm = document.getElementById('chat-form');
+
+            if (!messageInput) return;
+
+            // 自动调整文本框高度
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+
+                // 更新字符计数
+                const count = this.value.length;
+                charCount.textContent = `${count}/200`;
+
+                // 控制发送按钮状态
+                sendBtn.disabled = count === 0;
+
+                if (count > 180) {
+                    charCount.style.color = '#f44336';
+                } else if (count > 150) {
+                    charCount.style.color = '#ff9800';
+                } else {
+                    charCount.style.color = '#666';
+                }
+            });
+
+            // 回车发送（Shift+回车换行）
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!sendBtn.disabled) {
+                        chatForm.submit();
+                    }
+                }
+            });
+        }
+
+        // 点击外部关闭菜单和面板
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+            const userInfo = document.querySelector('.user-info-nav');
+            const introPanel = document.getElementById('npc-intro-panel');
+
+            if (userMenu && !userMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+                userInfo.classList.remove('active');
+            }
+
+            if (introPanel && !introPanel.contains(event.target) && !event.target.closest('.info-toggle-btn')) {
+                introPanel.classList.remove('show');
+            }
+        });
+
+        // 模态框外部点击关闭
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

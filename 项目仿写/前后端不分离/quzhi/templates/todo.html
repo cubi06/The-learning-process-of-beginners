@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/todo.css' %}">
+    <title>待办事项 - 趣智系统</title>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+                <span class="nav-title">趣智任务管理</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/home/" class="nav-link">首页</a></li>
+                <li><a href="/visualization/" class="nav-link">任务</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-container">
+        <!-- 用户状态侧边栏 -->
+        <aside class="user-sidebar">
+            <div class="user-profile" onclick="showDialog()">
+                <div class="user-avatar">
+                    <img src="{% static 'img/li1.png' %}" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <!-- change -->
+                     <h3 class="user-name">{{user.name}}</h3>
+<!--                    <h3 class="user-name">小白</h3>-->
+                    <p class="user-level">任务管理专家</p>
+                </div>
+            </div>
+
+
+
+            <!-- 快捷导航 -->
+            <nav class="quick-nav">
+                <a href="/visualization/" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>任务</span>
+                </a>
+                <!-- change -->
+                 <a href="/visualization/displaytree/" class="nav-item">
+<!--                <a href="#" class="nav-item">-->
+                    <div class="nav-icon">🌳</div>
+                    <span>事件总览</span>
+                </a>
+
+                <a href="/visualization/todo_list/" class="nav-item active">
+                    <div class="nav-icon">📝</div>
+                    <span>待办事项</span>
+                </a>
+            </nav>
+
+            <!-- 快速统计 -->
+            <div class="quick-stats" style="background: #f8f9fa; border-radius: 12px; padding: 20px;">
+                <h4 style="margin-bottom: 15px; color: #333; font-size: 16px;">📊 快速统计</h4>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">📝</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                          <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ total_todos }}</span>
+<!--                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">1</span>-->
+                        <span class="stat-label" style="font-size: 12px; color: #666;">总数</span>
+                    </div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">✅</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                         <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ completed_todos }}</span>
+<!--                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">1</span>-->
+
+                        <span class="stat-label" style="font-size: 12px; color: #666;">已完成</span>
+                    </div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
+                    <span class="stat-icon" style="font-size: 20px; width: 30px; text-align: center;">⏳</span>
+                    <div class="stat-content" style="flex: 1;">
+                        <!-- change -->
+                          <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">{{ pending_todos }}</span>
+<!--                        <span class="stat-number" style="display: block; font-size: 18px; font-weight: 700; color: #333;">1</span>-->
+
+                        <span class="stat-label" style="font-size: 12px; color: #666;">待完成</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 页面标题和操作 -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">📝 待办事项</h1>
+                    <p class="page-description">管理您的待办事项，提高工作效率</p>
+                </div>
+            </div>
+
+            <!-- 标题和视图控制 -->
+            <div class="section-header">
+                <div class="section-title">
+                    <h2>全部待办事项</h2>
+                </div>
+                <div class="view-controls">
+                    <button class="view-toggle active" data-view="grid" title="网格视图">
+                        <span class="view-icon">⊞</span>
+                    </button>
+                    <button class="view-toggle" data-view="list" title="列表视图">
+                        <span class="view-icon">📋</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 待办事项列表 -->
+            <div class="todo-container">
+                <div class="todo-grid" id="todo-grid">
+                    <!-- 删除按钮 -->
+                    <!-- change -->
+
+                    {% for todo in user.todos.all %}
+                        <div class="todo-card" data-todo-id="{{ todo.id }}" data-status="{{ todo.state }}">
+                            <button class="todo-delete-btn" onclick="deleteTodo('{{ todo.id }}', '{{ todo.name }}')" title="删除待办事项"
+                                    style="position: absolute; top: 10px; right: 10px; background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"
+                                    onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"
+                                    onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">
+                                删除
+                            </button>
+
+                            <div class="todo-content">
+                                <h3 class="todo-title">{{ todo.name }}</h3>
+                                <p class="todo-description">{{ todo.description|default:"暂无描述" }}</p>
+
+                                <div class="todo-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📅</span>
+                                        <span class="meta-text">{{ todo.date|date:"Y-m-d" }}</span>
+                                    </div>
+                                    {% if todo.state == 1 %}
+                                        <div class="meta-item completed">
+                                            <span class="meta-icon">✅</span>
+                                            <span class="meta-text">已完成</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="meta-item pending">
+                                            <span class="meta-icon">⏳</span>
+                                            <span class="meta-text">待完成</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <h3>暂无待办事项</h3>
+                            <p>请通过首页添加您的待办事项</p>
+                            <a href="/home/" class="btn-add-empty">前往首页</a>
+                        </div>
+                    {% endfor %} 
+
+
+<!--                    <div class="todo-card" data-todo-id="0" data-status="1">-->
+<!--                            &lt;!&ndash; 删除按钮 &ndash;&gt;-->
+<!--                            <button class="todo-delete-btn" onclick="deleteTodo('0', 'python')" title="删除待办事项"-->
+<!--                                    style="position: absolute; top: 10px; right: 10px; background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"-->
+<!--                                    onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"-->
+<!--                                    onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">-->
+<!--                                删除-->
+<!--                            </button>-->
+
+<!--                            <div class="todo-content">-->
+<!--                                <h3 class="todo-title">python</h3>-->
+<!--                                <p class="todo-description">"暂无描述"</p>-->
+
+<!--                                <div class="todo-meta">-->
+<!--                                    <div class="meta-item">-->
+<!--                                        <span class="meta-icon">📅</span>-->
+<!--                                        <span class="meta-text">2028年1月1日</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="meta-item completed">-->
+<!--                                        <span class="meta-icon">✅</span>-->
+<!--                                        <span class="meta-text">已完成</span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                    </div>-->
+
+
+<!--                    <div class="todo-card" data-todo-id="0" data-status="0">-->
+<!--                            &lt;!&ndash; 删除按钮 &ndash;&gt;-->
+<!--                            <button class="todo-delete-btn" onclick="deleteTodo('0', 'python')" title="删除待办事项"-->
+<!--                                    style="position: absolute; top: 10px; right: 10px; background: transparent; border: 1px solid #ddd; color: #666; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 400; transition: all 0.2s ease; outline: none;"-->
+<!--                                    onmouseover="this.style.borderColor='#ff4757'; this.style.color='#ff4757'; this.style.background='rgba(255, 71, 87, 0.05)';"-->
+<!--                                    onmouseout="this.style.borderColor='#ddd'; this.style.color='#666'; this.style.background='transparent';">-->
+<!--                                删除-->
+<!--                            </button>-->
+
+<!--                            <div class="todo-content">-->
+<!--                                <h3 class="todo-title">python</h3>-->
+<!--                                <p class="todo-description">"暂无描述"</p>-->
+
+<!--                                <div class="todo-meta">-->
+<!--                                    <div class="meta-item">-->
+<!--                                        <span class="meta-icon">📅</span>-->
+<!--                                        <span class="meta-text">2028年1月1日</span>-->
+<!--                                    </div>-->
+<!--                                        <div class="meta-item pending">-->
+<!--                                            <span class="meta-icon">⏳</span>-->
+<!--                                            <span class="meta-text">待完成</span>-->
+<!--                                        </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                    </div>-->
+
+
+
+                    
+
+                </div>
+            </div>
+
+
+        </main>
+    </div>
+
+    <!-- 用户信息对话框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <form method="post" action="/infochange/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <input type="text" value="{{ user.id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <input type="text" name="uname" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 用户信息对话框功能
+        function showDialog() {
+            document.getElementById("user-modal").style.display = "block";
+        }
+
+        function closeDialog() {
+            document.getElementById("user-modal").style.display = "none";
+        }
+
+        // 视图切换功能
+        document.querySelectorAll('.view-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-toggle').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const view = this.dataset.view;
+                const todoGrid = document.getElementById('todo-grid');
+
+                if (view === 'list') {
+                    todoGrid.classList.add('list-view');
+                } else {
+                    todoGrid.classList.remove('list-view');
+                }
+            });
+        });
+
+        // 页面加载时初始化视图
+        document.addEventListener('DOMContentLoaded', function() {
+            const todoGrid = document.getElementById('todo-grid');
+            const activeView = document.querySelector('.view-toggle.active');
+
+            if (activeView && activeView.dataset.view === 'list') {
+                todoGrid.classList.add('list-view');
+            } else {
+                todoGrid.classList.remove('list-view');
+            }
+        });
+
+        // 删除待办事项函数
+        function deleteTodo(todoId, todoName) {
+            if (confirm(`确定要删除待办事项"${todoName}"吗？\n删除后将无法恢复！`)) {
+                console.log('开始删除待办事项:', todoId, todoName);
+
+                // 检查CSRF token
+                const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    alert('CSRF token未找到，请刷新页面重试');
+                    return;
+                }
+                // change
+                fetch('/delete_todo/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken.value,
+                    },
+                    body: JSON.stringify({ todo_id: parseInt(todoId) }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    // 删除成功后移除待办事项卡片
+                    const todoCard = document.querySelector(`[data-todo-id="${todoId}"]`);
+                    if (todoCard) {
+                        todoCard.style.transform = 'scale(0.8)';
+                        todoCard.style.opacity = '0';
+                        setTimeout(() => {
+                            todoCard.remove();
+                            // 检查是否还有待办事项，如果没有显示空状态
+                            const todoGrid = document.getElementById('todo-grid');
+                            if (todoGrid.children.length === 0) {
+                                todoGrid.innerHTML = `
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📝</div>
+                                        <h3>暂无待办事项</h3>
+                                        <p>请通过首页添加您的待办事项</p>
+                                        <a href="/home/" class="btn-add-empty">前往首页</a>
+                                    </div>
+                                `;
+                            }
+                        }, 300);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (error.error) {
+                        alert('删除失败：' + error.error);
+                    } else {
+                        alert('删除失败，请稍后重试');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

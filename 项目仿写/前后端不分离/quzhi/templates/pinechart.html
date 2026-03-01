@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pinechart.css' %}">
+    <title>完成情况分析 - 趣智系统</title>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo">
+                <span class="nav-title">趣智任务管理</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/home/" class="nav-link">首页</a></li>
+                <li><a href="/visualization/" class="nav-link">任务</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-container">
+        <!-- 用户状态侧边栏 -->
+        <aside class="user-sidebar">
+            <div class="user-profile" onclick="showDialog()">
+                <div class="user-avatar">
+                    <img src="{% static 'img/li1.png' %}" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <h3 class="user-name">{{user.name}}</h3>
+                    <p class="user-level">任务管理专家</p>
+                </div>
+            </div>
+
+
+
+            <!-- 快捷导航 -->
+            <nav class="quick-nav">
+                <a href="/visualization/" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>任务</span>
+                </a>
+                <a href="/visualization/displaytree/" class="nav-item">
+                    <div class="nav-icon">🌳</div>
+                    <span>事件总览</span>
+                </a>
+
+                <a href="/visualization/pinechart/" class="nav-item active">
+                    <div class="nav-icon">📈</div>
+                    <span>完成情况</span>
+                </a>
+            </nav>
+
+            <!-- 快速统计 -->
+            <div class="quick-stats">
+                <h4>📊 快速统计</h4>
+                <div class="stat-item">
+                    <span class="stat-icon">✅</span>
+                    <div class="stat-content">
+                        <!-- change -->
+                         {# <span class="stat-number">{{ done }}</span> #}
+<!--                        <span class="stat-number">12</span>-->
+                        <span class="stat-label">已完成</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⏳</span>
+                    <div class="stat-content">
+                        <!-- change -->
+                         {# <span class="stat-number">{{ todo }}</span> #}
+<!--                        <span class="stat-number">12</span>-->
+                        <span class="stat-label">待完成</span>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1 class="page-title">📈 待办完成情况分析</h1>
+                <p class="page-description">全面分析您的任务和待办事项完成情况</p>
+            </div>
+
+            <!-- 数据概览卡片 -->
+            <div class="overview-cards">
+                <div class="overview-card completed">
+                    <div class="card-icon">✅</div>
+                    <div class="card-content">
+                        <!-- change -->
+                          <h3>{{ done }}</h3>
+<!--                        <h3>3</h3>-->
+                        <p>已完成</p>
+                    </div>
+                </div>
+                <div class="overview-card pending">
+                    <div class="card-icon">⏳</div>
+                    <div class="card-content">
+                        <!-- change -->
+                          <h3>{{ todo }}</h3>
+<!--                        <h3>3</h3>-->
+
+                        <p>待完成</p>
+                    </div>
+                </div>
+                <div class="overview-card total">
+                    <div class="card-icon">📊</div>
+                    <div class="card-content">
+                          <h3>{{ done|add:todo }}</h3>
+<!--                        <h3>3</h3>-->
+                        <p>总计</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图表区域 -->
+            <div class="charts-container">
+                <!-- 饼图 -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h3>🥧 待办完成情况分布</h3>
+                        <p>各状态任务的比例分布</p>
+                    </div>
+                    <div id="pie-chart" class="chart"></div>
+                </div>
+
+                <!-- 柱状图 -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h3>📊 待办完成情况对比</h3>
+                        <p>不同状态的数量对比</p>
+                    </div>
+                    <div id="bar-chart" class="chart"></div>
+                </div>
+            </div>
+
+            <!-- 趋势分析 -->
+            <div class="trend-section">
+                <div class="chart-header">
+                    <h3>📈 每日任务打卡趋势分析</h3>
+                    <p>近期任务完成情况趋势</p>
+                </div>
+                <div id="trend-chart" class="chart trend-chart"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 用户信息对话框 -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 角色信息</h3>
+                <span class="close" onclick="closeDialog()">&times;</span>
+            </div>
+            <form method="post" action="/infochange/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>用户ID：</label>
+                    <input type="text" value="{{ user.id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>用户名：</label>
+                    <input type="text" name="uname" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input type="password" name="password" value="******" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="closeDialog()" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/echarts.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <script>
+        let pieChart, barChart, trendChart;
+
+        // 用户对话框控制
+        function showDialog() {
+            document.getElementById("user-modal").style.display = "block";
+        }
+
+        function closeDialog() {
+            document.getElementById("user-modal").style.display = "none";
+        }
+
+
+
+        // 获取数据
+        // change
+        const completedCount = {{ done }};  // 已完成
+        const pendingCount = {{ todo }};    // 待完成
+        // const completedCount = 5;  // 已完成
+        // const pendingCount = 3;    // 待完成
+        const totalCount = completedCount + pendingCount;
+
+        // 初始化饼图
+        function initPieChart() {
+            const dom = document.getElementById("pie-chart");
+            pieChart = echarts.init(dom);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#333'
+                    },
+                    formatter: '{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: '10%',
+                    top: 'center',
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 14
+                    }
+                },
+                series: [{
+                    name: '完成情况',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['40%', '50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        {
+                            value: completedCount,
+                            name: '已完成',
+                            itemStyle: { color: '#4CAF50' }
+                        },
+                        {
+                            value: pendingCount,
+                            name: '待完成',
+                            itemStyle: { color: '#FF9800' }
+                        }
+                    ]
+                }]
+            };
+
+            pieChart.setOption(option);
+        }
+
+        // 初始化柱状图
+        function initBarChart() {
+            const dom = document.getElementById("bar-chart");
+            barChart = echarts.init(dom);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                grid: {
+                    left: '15%',
+                    right: '10%',
+                    top: '10%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['已完成', '待完成'],
+                    axisLine: {
+                        lineStyle: { color: '#667eea' }
+                    },
+                    axisTick: { show: false },
+                    axisLabel: {
+                        color: '#333',
+                        fontSize: 12
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    axisLabel: {
+                        color: '#666'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [
+                        { value: completedCount, itemStyle: { color: '#4CAF50' } },
+                        { value: pendingCount, itemStyle: { color: '#FF9800' } }
+                    ],
+                    barWidth: '60%',
+                    itemStyle: {
+                        borderRadius: [10, 10, 0, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#333',
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                }]
+            };
+
+            barChart.setOption(option);
+        }
+
+        // 初始化趋势图
+        function initTrendChart() {
+            const dom = document.getElementById("trend-chart");
+            trendChart = echarts.init(dom);
+
+            // 使用真实的每日完成数据
+            // change
+            // const dates = ["08/16", "08/17", "08/18", "08/19", "08/20", "08/21", "08/22"];
+            const dates = [];
+            // const completedData = [1, 2, 3, 4, 5, 6, 7];
+            const completedData = [];
+            // 处理后端传来的每日统计数据
+            // change
+            {% for stat in daily_stats %}
+                dates.push('{{ stat.date }}');
+                completedData.push({{ stat.completed }});
+            {% endfor %}
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                legend: {
+                    data: ['每日完成'],
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    top: '15%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: dates,
+                    axisLine: {
+                        lineStyle: { color: '#667eea' }
+                    },
+                    axisTick: { show: false },
+                    axisLabel: {
+                        color: '#333'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    axisLabel: {
+                        color: '#666'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '每日完成',
+                        type: 'line',
+                        data: completedData,
+                        smooth: true,
+                        lineStyle: {
+                            color: '#4CAF50',
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: '#4CAF50',
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(76, 175, 80, 0.3)' },
+                                { offset: 1, color: 'rgba(76, 175, 80, 0.1)' }
+                            ])
+                        },
+                        markPoint: {
+                            data: [
+                                { type: 'max', name: '最大值' },
+                                { type: 'min', name: '最小值' }
+                            ]
+                        }
+                    }
+                ]
+            };
+
+            trendChart.setOption(option);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化主要图表
+            setTimeout(() => {
+                initPieChart();
+                initBarChart();
+                initTrendChart();
+            }, 100);
+
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                if (pieChart) pieChart.resize();
+                if (barChart) barChart.resize();
+                if (trendChart) trendChart.resize();
+            });
+        });
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('user-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

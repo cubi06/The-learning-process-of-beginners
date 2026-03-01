@@ -1,0 +1,1249 @@
+/* NPC伙伴页面现代化样式 */
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* 导航栏样式 */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.nav-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* 用户菜单样式 */
+.user-menu {
+    position: relative;
+}
+
+.user-info-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.user-info-nav:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.user-avatar-nav {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.user-name-nav {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.user-info-nav.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    min-width: 160px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+}
+
+.dropdown-item:last-child {
+    color: #f44336;
+}
+
+.dropdown-item:last-child:hover {
+    background: #ffebee;
+}
+
+.dropdown-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+/* 主要内容区域 */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    min-height: calc(100vh - 100px);
+}
+
+/* 用户侧边栏 */
+.user-sidebar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 16px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-bottom: 25px;
+}
+
+.user-profile:hover {
+    transform: translateY(-2px);
+}
+
+.user-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.user-level {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* 状态图表容器 */
+.stats-container {
+    margin-bottom: 25px;
+}
+
+.stat-chart {
+    height: 60px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* 快捷导航 */
+.quick-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #666;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+/* 聊天容器 */
+.chat-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px);
+    overflow: hidden;
+}
+
+/* NPC信息卡片 */
+.npc-info-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+}
+
+.npc-avatar-container {
+    position: relative;
+}
+
+.npc-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.npc-avatar:hover {
+    transform: scale(1.05);
+}
+
+.npc-status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid white;
+}
+
+.npc-status.online {
+    background: #4CAF50;
+}
+
+.npc-details {
+    flex: 1;
+}
+
+.npc-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.npc-role {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.npc-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.tag {
+    padding: 4px 12px;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.npc-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.action-btn,
+.info-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover,
+.info-toggle-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+}
+
+.clear-chat-btn {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+.clear-chat-btn:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.clear-chat-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.action-icon,
+.info-icon {
+    font-size: 16px;
+}
+
+/* 聊天区域 */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px 30px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+/* 自定义滚动条 */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8, #6a42a0);
+}
+
+/* 消息样式 */
+.message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    animation: messageSlideIn 0.3s ease;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.message-content {
+    max-width: 70% !important; /* 最大宽度限制 */
+    width: auto !important; /* 根据内容自适应宽度 */
+    flex: none !important; /* 取消flex自动扩展 */
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.sender-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.message-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.message-text {
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    position: relative;
+    display: inline-block !important; /* 让宽度根据内容自适应 */
+    width: auto !important; /* 自动宽度 */
+    max-width: none !important; /* 移除最大宽度限制，让父容器控制 */
+    min-width: 60px; /* 设置最小宽度，避免太短的消息显示异常 */
+}
+
+/* NPC消息样式 */
+.npc-message {
+    justify-content: flex-start;
+    flex-direction: row; /* 正常方向，头像在左侧 */
+}
+
+.npc-message .message-avatar {
+    order: 1; /* 头像在前（左侧） */
+    margin-right: 10px; /* 头像与消息的间距 */
+    margin-left: 0;
+}
+
+.npc-message .message-content {
+    order: 2; /* 消息内容在后 */
+    text-align: left;
+    width: auto !important; /* 根据内容自适应宽度 */
+    max-width: 70% !important; /* 最大宽度限制 */
+    flex: none !important; /* 取消flex自动扩展 */
+}
+
+.npc-message .message-text {
+    background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    color: #333;
+}
+
+.npc-message .message-text::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 15px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #f8f9ff;
+}
+
+/* 用户消息样式 */
+.user-message {
+    justify-content: flex-end;
+    flex-direction: row; /* 正常方向，让头像在右侧 */
+}
+
+.user-message .message-content {
+    text-align: right;
+    order: 1; /* 消息内容在前 */
+    width: auto !important; /* 根据内容自适应宽度 */
+    max-width: 70% !important; /* 最大宽度限制 */
+    flex: none !important; /* 取消flex自动扩展 */
+}
+
+.user-message .message-avatar {
+    order: 2; /* 头像在后（右侧） */
+    margin-left: 10px; /* 头像与消息的间距 */
+    margin-right: 0;
+}
+
+.user-message .message-text {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.user-message .message-text::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 15px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid #667eea;
+}
+
+/* 欢迎消息 */
+.welcome-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.welcome-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.welcome-message h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.welcome-message p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 聊天输入区域 */
+.chat-input-area {
+    padding: 20px 30px;
+    border-top: 1px solid #e0e0e0;
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.chat-form {
+    width: 100%;
+}
+
+.input-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    transition: border-color 0.3s ease;
+}
+
+.input-container:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#message-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: inherit;
+    background: transparent;
+    min-height: 24px;
+    max-height: 120px;
+}
+
+#message-input::placeholder {
+    color: #999;
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.char-count {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.send-icon {
+    font-size: 14px;
+}
+
+/* NPC介绍面板 */
+.npc-intro-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1500;
+    overflow-y: auto;
+}
+
+.npc-intro-panel.show {
+    right: 0;
+}
+
+.intro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+}
+
+.intro-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close-intro-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-intro-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+}
+
+.intro-content {
+    padding: 30px;
+}
+
+.intro-image {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.npc-large-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+}
+
+.intro-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #555;
+    text-align: justify;
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close {
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.close:hover {
+    color: #333;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    padding: 0 30px;
+}
+
+.form-group:first-of-type {
+    margin-top: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input[readonly] {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.user-stats-modal {
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 500;
+    color: #333;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 25px 30px;
+    border-top: 1px solid #eee;
+}
+
+.btn-cancel,
+.btn-submit {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* 注销模态框样式 */
+.logout-modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.logout-header {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border-radius: 16px 16px 0 0;
+}
+
+.logout-header h3 {
+    color: white;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.logout-message {
+    text-align: center;
+}
+
+.logout-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.logout-message h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.logout-message p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 0 30px 30px;
+}
+
+.btn-logout {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: 280px 1fr;
+        gap: 20px;
+    }
+
+    .npc-intro-panel {
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 15px;
+        height: 60px;
+    }
+
+    .nav-title {
+        font-size: 18px;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .main-container {
+        grid-template-columns: 1fr;
+        padding: 20px 15px;
+        gap: 20px;
+    }
+
+    .user-sidebar {
+        position: static;
+        order: 2;
+        padding: 20px;
+    }
+
+    .chat-container {
+        order: 1;
+        height: 70vh;
+    }
+
+    .npc-info-card {
+        padding: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .npc-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .npc-name {
+        font-size: 20px;
+    }
+
+    .chat-messages {
+        padding: 15px 20px;
+    }
+
+    .message-content {
+        max-width: 85%; /* 移动端稍微增加最大宽度 */
+        width: fit-content; /* 保持自适应 */
+    }
+
+    .npc-message .message-content,
+    .user-message .message-content {
+        max-width: 85%; /* 移动端增加最大宽度 */
+    }
+
+    .chat-input-area {
+        padding: 15px 20px;
+    }
+
+    .input-container {
+        padding: 10px 15px;
+    }
+
+    #message-input {
+        font-size: 16px;
+    }
+
+    .npc-intro-panel {
+        width: 100%;
+        right: -100%;
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+
+    .form-group,
+    .user-stats-modal,
+    .form-actions,
+    .modal-body {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .quick-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
+    .nav-item {
+        flex-shrink: 0;
+        min-width: 100px;
+        text-align: center;
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .nav-icon {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding: 15px 10px;
+    }
+
+    .user-sidebar {
+        padding: 15px;
+    }
+
+    .user-profile {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .npc-info-card {
+        padding: 15px;
+        text-align: center;
+    }
+
+    .npc-details {
+        text-align: center;
+    }
+
+    .chat-messages {
+        padding: 10px 15px;
+    }
+
+    .chat-input-area {
+        padding: 10px 15px;
+    }
+
+    .input-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .input-actions {
+        justify-content: space-between;
+    }
+
+    .send-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 8px;
+    }
+
+    .modal-content {
+        margin: 5% auto;
+    }
+}
+
+/* 动画和过渡效果 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.npc-status.online {
+    animation: pulse 2s infinite;
+}
+
+/* 滚动条样式统一 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f1f1;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8, #6a42a0);
+}
+
+/* 加载状态 */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #667eea;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 强制消息框自适应宽度 - 高优先级规则 */
+.chat-messages .message .message-content {
+    width: auto !important;
+    flex: none !important;
+    display: inline-block !important;
+}
+
+.chat-messages .message .message-text {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 60px !important;
+}

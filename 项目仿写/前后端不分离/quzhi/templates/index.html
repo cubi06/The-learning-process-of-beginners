@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 趣智任务管理系统</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+</head>
+
+<body>
+    <!-- 背景装饰 -->
+    <div class="background-decoration">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+    </div>
+
+    <!-- 主要内容容器 -->
+    <div class="main-container">
+        <!-- 左侧信息面板 -->
+        <div class="info-panel">
+            <div class="brand-section">
+                <img src="{% static 'img/logo2.0.png' %}" alt="Logo" class="brand-logo">
+                <h1 class="brand-title">趣智任务管理</h1>
+                <p class="brand-subtitle">让学习和工作变得更有趣</p>
+            </div>
+
+            <div class="features-section">
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-content">
+                        <h3>智能任务管理</h3>
+                        <p>高效管理您的日常任务和待办事项</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-content">
+                        <h3>数据可视化</h3>
+                        <p>直观展示您的学习和工作进度</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎮</div>
+                    <div class="feature-content">
+                        <h3>游戏化体验</h3>
+                        <p>通过游戏化机制提升学习动力</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧登录面板 -->
+        <div class="login-panel">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>欢迎回来</h2>
+                    <p>请登录您的账户继续使用</p>
+                </div>
+
+                <!-- 成功消息显示 -->
+                <!-- change -->
+                <!-- 
+                {% comment %}
+                {% if success %}
+                <div class="success-alert">
+                    <span class="success-icon">✅</span>
+                    <span class="success-text">{{ success }}</span>
+                </div>
+                {% endif %} 
+                {% endcomment %}
+                -->
+
+                <!-- 错误消息显示 -->
+                <!-- change -->
+                <!-- 
+                {% comment %}
+                {% if error %}
+                <div class="error-alert">
+                    <span class="error-icon">⚠️</span>
+                    <span class="error-text">{{ error }}</span>
+                </div>
+                {% endif %} 
+                {% endcomment %}
+                
+                -->
+
+                <!-- 登录表单 -->
+                <!-- change -->
+                 <form class="login-form" method="post" action="/login_form/" id="loginForm">
+<!--                <form class="login-form" method="post" action="#" id="loginForm">-->
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="account">账号</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="account" name="account" placeholder="请输入您的账号" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="remember">
+                            <span class="checkmark"></span>
+                            记住我
+                        </label>
+                        <a href="#" class="forgot-password">忘记密码？</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <span class="btn-text">登录</span>
+                        <span class="btn-loading" style="display: none;">登录中...</span>
+                    </button>
+                </form>
+
+                <!-- 注册提示 -->
+                <div class="register-prompt">
+                    <p>还没有账户？</p>
+                    <button class="register-btn" onclick="showRegisterModal()">立即注册</button>
+                </div>
+
+                <!-- 社交登录 -->
+                <div class="social-login">
+                    <div class="divider">
+                        <span>或者</span>
+                    </div>
+                    <div class="social-buttons">
+                        <button class="social-btn wechat">
+                            <span class="social-icon">💬</span>
+                            微信登录
+                        </button>
+                        <button class="social-btn qq">
+                            <span class="social-icon">🐧</span>
+                            QQ登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎉 加入趣智大家庭</h3>
+                <span class="close" onclick="closeRegisterModal()">&times;</span>
+            </div>
+            <!-- change -->
+             <form class="register-form" method="post" action="/register/" id="registerForm">
+<!--            <form class="register-form" method="post" action="#" id="registerForm">-->
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reg-name">冒险者姓名</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✨</span>
+                        <input type="text" id="reg-name" name="name" placeholder="请输入您的姓名" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">设置密码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔐</span>
+                        <input type="password" id="reg-password" name="password" placeholder="请设置您的密码" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">确认密码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔐</span>
+                        <input type="password" id="confirm-password" name="confirm_password" placeholder="请再次输入密码" required>
+                    </div>
+                </div>
+
+                <div class="register-tips">
+                    <div class="tip-item">
+                        <span class="tip-icon">💡</span>
+                        <span>请务必牢记您的账号信息</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">🎯</span>
+                        <span>注册后即可开始您的学习之旅</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="register-submit-btn">
+                    <span class="btn-text">开始冒险</span>
+                    <span class="btn-loading" style="display: none;">注册中...</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 错误提示 -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <span class="toast-icon">⚠️</span>
+            <span class="toast-message">这是一条提示消息</span>
+        </div>
+    </div>
+
+    <script src="{% static 'js/login.js' %}"></script>
+
+    <!-- 自动显示注册模态框 -->
+    <!-- change -->
+
+    {% if show_register %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showRegisterModal();
+        });
+    </script>
+    {% endif %} 
+
+
+    <!-- 显示错误提示 -->
+    <!-- change -->
+
+    {% if error and show_register %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                showToast('{{ error }}', 'error');
+            }, 500);
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>
