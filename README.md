@@ -7,7 +7,11 @@ The learning process of beginners
 (2)day4——day6 
 mysql数据库环境配置，数据库的使用
 
-(3)day7——day13
+(3)day7——day9
 Django 项目文件创建，学习他人模板，学习Django基础操作
 
-(4)
+(4)day9——day14
+前后端不分离项目仿写(前端框架已经搭好)
+
+(5)day14——day
+前后端分离项目仿写
