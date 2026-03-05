@@ -1,0 +1,81 @@
+select 0
+
+keys *
+
+del name
+exists name
+
+set name zhangsan
+
+rename name username
+
+flushdb
+
+flushall
+
+set name 张三
+set age 18
+set gender 男
+set score 80.2
+set class 1172
+
+get name
+get age
+get gender
+get score
+get class
+
+mset address "北京" height 175 weight 80
+
+mget name age gender score class address height weight
+
+set email_code 1234 EX 20
+ttl email_code
+
+persist email_code
+
+
+lpush list_01 1 2 3
+rpush list_01 z v
+
+linsert list_01 after z c
+linsert list_01 before v 0
+
+
+lrange list_01 0 -1
+lrange list_01 0 2
+
+llen list_01
+
+lpop list_01
+rpop list_01
+
+lrem list_01  1 0
+
+lset list_01 0 o
+
+
+hset hash_01 name 张三
+hmset hash_01 age 18 gender 男
+
+hlen hash_01
+
+hexists hash_01 name
+hget hash_01 name
+hmget hash_01 age gender
+hgetall hash_01
+hkeys hash_01
+hvals hash_01
+hdel hash_01 name
+
+sadd set_01 1 2 3 4 4 5 5 6 6
+smembers set_01
+srem set_01 5 6 7
+sismember set_01 4
+srandmember set_01 2
+spop set_01
+scard set_01
+sadd set_02 1 2 3
+sunion set_01 set_02
+sinter set_01 set_02
+
